@@ -1,0 +1,15 @@
+databaseChangeLog:
+  - include:
+      file: db/changelog/changeset/create-company-table.sql
+  - include:
+      file: db/changelog/changeset/create-client-table.sql
+  - include:
+      file: db/changelog/changeset/create-agent-table.sql
+  - include:
+      file: db/changelog/changeset/create-deal-table.sql
+  - include:
+      file: db/changelog/changeset/create-document-table.sql
+  - include:
+      file: db/changelog/changeset/create-meeting-table.sql
+  - include:
+      file: db/changelog/changeset/create-meetings-clients-table.sql
