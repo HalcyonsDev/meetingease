@@ -34,6 +34,9 @@ public class Agent extends BaseModel {
     @Column(name = "photo")
     private String photo;
 
+    @Column(name = "password")
+    private String password;
+
     @OneToMany(mappedBy = "agent")
     @JsonBackReference
     private List<Meeting> meetings;

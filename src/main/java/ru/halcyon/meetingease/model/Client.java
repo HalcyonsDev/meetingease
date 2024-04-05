@@ -3,16 +3,14 @@ package ru.halcyon.meetingease.model;
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 import ru.halcyon.meetingease.model.support.Role;
 
 import java.util.List;
 
 @Entity
 @Table(name = "clients")
+@Builder
 @Getter
 @Setter
 @NoArgsConstructor
@@ -34,7 +32,14 @@ public class Client extends BaseModel {
     private String position;
 
     @Column(name = "role")
+    @Enumerated(EnumType.STRING)
     private Role role;
+
+    @Column(name = "password")
+    private String password;
+
+    @Column(name = "photo")
+    private String photo;
 
     @ManyToOne
     @JoinColumn(name = "company_id", referencedColumnName = "id")

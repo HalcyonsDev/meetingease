@@ -25,7 +25,7 @@ public class Company extends BaseModel {
     @Column(name = "description")
     private String description;
 
-    @OneToMany(mappedBy = "clients")
+    @OneToMany(mappedBy = "company")
     @JsonBackReference
     private List<Client> clients;
 }
