@@ -67,8 +67,8 @@ public class AgentAuthServiceImpl implements AgentAuthService {
     }
 
     private AuthResponse getAuthResponse(Agent agent) {
-        String accessToken = jwtProvider.generateTokenForClient(agent, false);
-        String refreshToken = jwtProvider.generateTokenForClient(agent, true);
+        String accessToken = jwtProvider.generateTokenForAgent(agent, false);
+        String refreshToken = jwtProvider.generateTokenForAgent(agent, true);
 
         return new AuthResponse(accessToken, refreshToken);
     }
