@@ -1,14 +1,13 @@
 package ru.halcyon.meetingease.model;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.OneToMany;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.hibernate.annotations.JdbcTypeCode;
+import org.hibernate.type.SqlTypes;
 
 import java.util.List;
 
@@ -22,9 +21,9 @@ public class Deal extends BaseModel {
     @Column(name = "type")
     private String type;
 
-    @OneToMany(mappedBy = "deal")
-    @JsonBackReference
-    private List<Document> requiredDocuments;
+    @Column(name = "required_documents")
+    @JdbcTypeCode(SqlTypes.JSON)
+    private List<String> requiredDocuments;
 
     @OneToMany(mappedBy = "deal")
     @JsonBackReference
