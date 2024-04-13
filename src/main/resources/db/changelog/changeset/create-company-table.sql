@@ -4,6 +4,6 @@
 -- createTable: companies
 CREATE TABLE IF NOT EXISTS companies(
     id BIGSERIAL PRIMARY KEY NOT NULL,
-    name VARCHAR(100),
-    description VARCHAR(500)
+    name VARCHAR(100) NOT NULL UNIQUE,
+    description VARCHAR(500) NOT NULL
 )

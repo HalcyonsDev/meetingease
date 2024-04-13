@@ -77,6 +77,7 @@ public class ClientAuthServiceImpl implements ClientAuthService {
         return new AuthResponse(accessToken, newRefreshToken);
     }
 
+    @Override
     public JwtAuthentication getAuthInfo() {
         return (JwtAuthentication) SecurityContextHolder.getContext().getAuthentication();
     }

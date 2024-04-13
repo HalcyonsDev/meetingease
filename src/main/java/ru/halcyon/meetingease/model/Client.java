@@ -1,7 +1,6 @@
 package ru.halcyon.meetingease.model;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
-import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import lombok.*;
 import ru.halcyon.meetingease.model.support.Role;
@@ -43,7 +42,7 @@ public class Client extends BaseModel {
 
     @ManyToOne
     @JoinColumn(name = "company_id", referencedColumnName = "id")
-    @JsonManagedReference
+    @JsonBackReference
     private Company company;
 
     @ManyToMany(mappedBy = "clients")

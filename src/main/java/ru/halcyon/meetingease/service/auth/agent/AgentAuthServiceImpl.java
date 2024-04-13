@@ -1,6 +1,7 @@
 package ru.halcyon.meetingease.service.auth.agent;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import ru.halcyon.meetingease.dto.AgentRegisterDto;
@@ -8,9 +9,9 @@ import ru.halcyon.meetingease.exception.ResourceAlreadyExistsException;
 import ru.halcyon.meetingease.exception.TokenValidationException;
 import ru.halcyon.meetingease.exception.WrongDataException;
 import ru.halcyon.meetingease.model.Agent;
-import ru.halcyon.meetingease.model.Client;
 import ru.halcyon.meetingease.security.AuthRequest;
 import ru.halcyon.meetingease.security.AuthResponse;
+import ru.halcyon.meetingease.security.JwtAuthentication;
 import ru.halcyon.meetingease.service.agent.AgentService;
 import ru.halcyon.meetingease.service.auth.JwtProvider;
 
@@ -71,5 +72,9 @@ public class AgentAuthServiceImpl implements AgentAuthService {
         String refreshToken = jwtProvider.generateTokenForAgent(agent, true);
 
         return new AuthResponse(accessToken, refreshToken);
+    }
+
+    public JwtAuthentication getAuthInfo() {
+        return (JwtAuthentication) SecurityContextHolder.getContext().getAuthentication();
     }
 }
