@@ -1,10 +1,7 @@
 package ru.halcyon.meetingease.model;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.OneToMany;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import lombok.*;
 
 import java.util.List;
@@ -32,10 +29,13 @@ public class Agent extends BaseModel {
     @Column(name = "photo")
     private String photo;
 
+    @Column(name = "city")
+    private String city;
+
     @Column(name = "password")
     private String password;
 
-    @OneToMany(mappedBy = "agent")
+    @OneToMany(mappedBy = "agent", fetch = FetchType.EAGER)
     @JsonBackReference
     private List<Meeting> meetings;
 }

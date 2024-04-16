@@ -6,6 +6,8 @@ import ru.halcyon.meetingease.exception.ResourceNotFoundException;
 import ru.halcyon.meetingease.model.Agent;
 import ru.halcyon.meetingease.repository.AgentRepository;
 
+import java.util.List;
+
 @Service
 @RequiredArgsConstructor
 public class AgentServiceImpl implements AgentService {
@@ -25,5 +27,10 @@ public class AgentServiceImpl implements AgentService {
     public Agent findByEmail(String email) {
         return agentRepository.findByEmail(email)
                 .orElseThrow(() -> new ResourceNotFoundException("Agent with this email not found."));
+    }
+
+    @Override
+    public List<Agent> findAllByCity(String city) {
+        return agentRepository.findAllByCity(city);
     }
 }

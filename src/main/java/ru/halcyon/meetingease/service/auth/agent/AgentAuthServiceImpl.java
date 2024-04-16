@@ -23,25 +23,6 @@ public class AgentAuthServiceImpl implements AgentAuthService {
     private final AgentService agentService;
 
     @Override
-    public AuthResponse register(AgentRegisterDto dto) {
-        if (agentService.existsByEmail(dto.getEmail())) {
-            throw new ResourceAlreadyExistsException("Agent with this email already exists.");
-        }
-
-        Agent agent = Agent.builder()
-                .name(dto.getName())
-                .surname(dto.getSurname())
-                .email(dto.getEmail())
-                .phoneNumber(dto.getPhoneNumber())
-                .password(passwordEncoder.encode(dto.getPassword()))
-                .build();
-
-        agentService.save(agent);
-
-        return getAuthResponse(agent);
-    }
-
-    @Override
     public AuthResponse login(AuthRequest request) {
         Agent agent = agentService.findByEmail(request.getEmail());
 

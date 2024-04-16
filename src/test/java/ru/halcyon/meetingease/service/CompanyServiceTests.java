@@ -1,4 +1,4 @@
-package ru.halcyon.meetingease.service.company;
+package ru.halcyon.meetingease.service;
 
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
@@ -21,12 +21,13 @@ import ru.halcyon.meetingease.model.support.Role;
 import ru.halcyon.meetingease.repository.ClientRepository;
 import ru.halcyon.meetingease.repository.CompanyRepository;
 import ru.halcyon.meetingease.security.JwtAuthentication;
+import ru.halcyon.meetingease.service.company.CompanyService;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
-@Testcontainers
 @SpringBootTest
+@Testcontainers
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
 public class CompanyServiceTests {
     @Container

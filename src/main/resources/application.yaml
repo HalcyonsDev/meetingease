@@ -19,3 +19,7 @@ jwt:
   secret:
     access: szdxcAew/l0CdtVhIpTDQSucIG8ZaIs8nl4LFuZ1QLHme13v9nTy+uCaV6/7oy0Kohi2JLaokndltIeOtThaww==
     refresh: gVxFuBqj6BkQVY1A8Hm3Jk0xcHQAwQ0gWJOLKwpXJLtojylfc3Y1l384GGnjKJx3RAF0ETKj7MVYvRok5sfjfg==
+
+dadata:
+  api_key: 3747c02f3352299a3864ef4b4c634a1c0c3a3816
+  secret_key: 0714909fca493258fb20e4509b0d4a2bf19aadec

@@ -22,16 +22,6 @@ import ru.halcyon.meetingease.service.auth.agent.AgentAuthService;
 public class AgentAuthController {
     private final AgentAuthService agentAuthService;
 
-    @PostMapping("/register")
-    public ResponseEntity<AuthResponse> register(@RequestBody @Valid AgentRegisterDto dto, BindingResult bindingResult) {
-        if (bindingResult.hasErrors()) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, bindingResult.getAllErrors().getFirst().getDefaultMessage());
-        }
-
-        AuthResponse response = agentAuthService.register(dto);
-        return ResponseEntity.ok(response);
-    }
-
     @PostMapping("/login")
     public ResponseEntity<AuthResponse> login(@RequestBody AuthRequest request) {
         AuthResponse response = agentAuthService.login(request);
