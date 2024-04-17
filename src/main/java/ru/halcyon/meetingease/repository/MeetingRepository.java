@@ -11,4 +11,5 @@ import java.util.List;
 @Repository
 public interface MeetingRepository extends JpaRepository<Meeting, Long> {
     List<Meeting> findAllByStatusAndClientsContaining(Status status, Client client);
+    List<Meeting> findAllByCityAndStatus(String city, Status status);
 }

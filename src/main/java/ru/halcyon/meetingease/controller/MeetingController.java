@@ -12,6 +12,7 @@ import ru.halcyon.meetingease.model.Meeting;
 import ru.halcyon.meetingease.service.meeting.MeetingService;
 
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("api/v1/meetings")
@@ -22,7 +23,7 @@ public class MeetingController {
     @PostMapping
     public ResponseEntity<Meeting> create(@RequestBody @Valid MeetingCreateDto dto, BindingResult bindingResult) {
         if (bindingResult.hasErrors()) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, bindingResult.getAllErrors().getFirst().getDefaultMessage());
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, bindingResult.getAllErrors().get(0).getDefaultMessage());
         }
 
         Meeting meeting = meetingService.create(dto);
@@ -45,5 +46,11 @@ public class MeetingController {
     public ResponseEntity<List<Meeting>> getAllScheduledMeetings() {
         List<Meeting> meetings = meetingService.findAllScheduledMeetings();
         return ResponseEntity.ok(meetings);
+    }
+
+    @GetMapping("/free-dates")
+    public ResponseEntity<Map<Integer, List<String>>> getFreeDatesForWeek(@RequestParam String city) {
+        Map<Integer, List<String>> dates = meetingService.getFreeDatesForWeek(city);
+        return ResponseEntity.ok(dates);
     }
 }

@@ -25,7 +25,7 @@ public class ClientAuthController {
     @PostMapping("/register")
     public ResponseEntity<AuthResponse> register(@RequestBody @Valid ClientRegisterDto dto, BindingResult bindingResult) {
         if (bindingResult.hasErrors()) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, bindingResult.getAllErrors().getFirst().getDefaultMessage());
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, bindingResult.getAllErrors().get(0).getDefaultMessage());
         }
 
         AuthResponse response = clientAuthService.register(dto);

@@ -21,7 +21,7 @@ public class CompanyController {
     @PostMapping
     public ResponseEntity<Company> create(@RequestBody @Valid CompanyCreateDto dto, BindingResult bindingResult) {
         if (bindingResult.hasErrors()) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, bindingResult.getAllErrors().getFirst().getDefaultMessage());
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, bindingResult.getAllErrors().get(0).getDefaultMessage());
         }
 
         Company company = companyService.create(dto);

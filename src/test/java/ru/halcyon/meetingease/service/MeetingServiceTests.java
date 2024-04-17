@@ -30,7 +30,6 @@ import ru.halcyon.meetingease.service.meeting.MeetingService;
 
 import java.time.Instant;
 import java.time.LocalDateTime;
-import java.time.LocalTime;
 import java.time.ZoneId;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -101,18 +100,33 @@ public class MeetingServiceTests {
         SecurityContextHolder.getContext().setAuthentication(jwtAuthentication);
 
         meetingService.create(
-                new MeetingCreateDto(getDate(2, 9, 30), "казань бауман 6", "Кредитование")
+                new MeetingCreateDto(getDate(2, 9, 30), "казань", "бауман", "31/12", "Кредитование")
         );
         meetingService.create(
-                new MeetingCreateDto(getDate(2, 10, 0), "казань бауман 6", "Кредитование")
+                new MeetingCreateDto(getDate(2, 10, 0), "казань", "бауман", "31/12", "Кредитование")
         );
 
-        assertThrows(WrongDataException.class, () -> meetingService.create(new MeetingCreateDto(getDate(2, 10, 10), "казань бауман 6", "Кредитование")));
-        assertThrows(WrongDataException.class, () -> meetingService.create(new MeetingCreateDto(getDate(2, 10, 30), "казань бауман 6", "Кредитование")));
+        assertThrows(WrongDataException.class, () -> meetingService.create(new MeetingCreateDto(getDate(2, 10, 10), "казань", "бауман", "31/12", "Кредитование")));
+        assertThrows(WrongDataException.class, () -> meetingService.create(new MeetingCreateDto(getDate(2, 10, 30), "казань", "бауман", "31/12", "Кредитование")));
 
-        meetingService.create(new MeetingCreateDto(getDate(3, 10, 10), "казань бауман 6", "Кредитование"));
-        meetingService.create(new MeetingCreateDto(getDate(3, 10, 10), "казань бауман 6", "Кредитование"));
-        assertThrows(WrongDataException.class, () ->  meetingService.create(new MeetingCreateDto(getDate(3, 10, 10), "казань бауман 6", "Кредитование")));
+        meetingService.create(new MeetingCreateDto(getDate(3, 10, 10), "казань", "бауман", "31/12", "Кредитование"));
+        meetingService.create(new MeetingCreateDto(getDate(3, 10, 10), "казань", "бауман", "31/12", "Кредитование"));
+        assertThrows(WrongDataException.class, () ->  meetingService.create(new MeetingCreateDto(getDate(3, 10, 10), "казань", "бауман", "31/12", "Кредитование")));
+    }
+
+    @Test
+    void getFreeDatesForWeek() {
+        Client client = createClient("test_email@gmail.com");
+
+        JwtAuthentication jwtAuthentication = new JwtAuthentication(true, client.getEmail(), true);
+        SecurityContextHolder.getContext().setAuthentication(jwtAuthentication);
+
+        meetingService.create(new MeetingCreateDto(getDate(19, 10, 0), "казань", "бауман", "31/12", "Кредитование"));
+        meetingService.create(new MeetingCreateDto(getDate(19, 17, 30), "казань", "бауман", "31/12", "Кредитование"));
+        meetingService.create(new MeetingCreateDto(getDate(20, 10, 30), "казань", "бауман", "31/12", "Кредитование"));
+
+        System.out.println(meetingRepository.findAll());
+        meetingService.getFreeDatesForWeek("Казань");
     }
 
     private Client createClient(String email) {
