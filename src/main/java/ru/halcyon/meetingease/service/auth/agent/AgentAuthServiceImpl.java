@@ -4,8 +4,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-import ru.halcyon.meetingease.dto.AgentRegisterDto;
-import ru.halcyon.meetingease.exception.ResourceAlreadyExistsException;
 import ru.halcyon.meetingease.exception.TokenValidationException;
 import ru.halcyon.meetingease.exception.WrongDataException;
 import ru.halcyon.meetingease.model.Agent;
@@ -39,7 +37,7 @@ public class AgentAuthServiceImpl implements AgentAuthService {
             throw new TokenValidationException("Refresh token is not valid.");
         }
 
-        String subject = jwtProvider.extractRefreshToken(refreshToken).getSubject();
+        String subject = jwtProvider.extractRefreshClaims(refreshToken).getSubject();
         Agent agent = agentService.findByEmail(subject);
 
         String accessToken = jwtProvider.generateTokenForAgent(agent, false);

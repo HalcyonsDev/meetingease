@@ -10,10 +10,27 @@ spring:
     username: postgres
     password: password
 
-
   jpa:
     hibernate:
       ddl-auto: none
+
+  mail:
+    protocol: smtp
+    host: smtp.gmail.com
+    port: 587
+    username: halcyon.ruslan@gmail.com
+    password: hifl fxfp brqz oavf
+    default-encoding: UTF-8
+    properties:
+      mail:
+        smtp:
+          writetimeout: 10000
+          connectiontimeout: 10000
+          timeout: 10000
+          auth: true
+          starttls:
+            enable: true
+            required: true
 
 jwt:
   secret:

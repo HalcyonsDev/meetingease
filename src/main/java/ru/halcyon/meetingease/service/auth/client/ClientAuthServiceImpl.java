@@ -15,6 +15,7 @@ import ru.halcyon.meetingease.security.AuthResponse;
 import ru.halcyon.meetingease.security.JwtAuthentication;
 import ru.halcyon.meetingease.service.auth.JwtProvider;
 import ru.halcyon.meetingease.service.client.ClientService;
+import ru.halcyon.meetingease.service.mail.MailService;
 
 @Service
 @RequiredArgsConstructor
@@ -22,6 +23,7 @@ public class ClientAuthServiceImpl implements ClientAuthService {
     private final JwtProvider jwtProvider;
     private final PasswordEncoder passwordEncoder;
     private final ClientService clientService;
+    private final MailService mailService;
 
     @Override
     public AuthResponse register(ClientRegisterDto dto) {
@@ -36,12 +38,15 @@ public class ClientAuthServiceImpl implements ClientAuthService {
                 .phoneNumber(dto.getPhoneNumber())
                 .position(dto.getPosition())
                 .role(Role.USER)
+                .isVerified(false)
                 .password(passwordEncoder.encode(dto.getPassword()))
                 .build();
 
         clientService.save(client);
+        AuthResponse response = getAuthResponse(client);
+        mailService.sendSimpleVerificationMailMessage(client.getName(), client.getEmail(), response.getAccessToken());
 
-        return getAuthResponse(client);
+        return response;
     }
 
     @Override
@@ -68,13 +73,24 @@ public class ClientAuthServiceImpl implements ClientAuthService {
             throw new TokenValidationException("Refresh token is not valid.");
         }
 
-        String subject = jwtProvider.extractRefreshToken(refreshToken).getSubject();
+        String subject = jwtProvider.extractRefreshClaims(refreshToken).getSubject();
         Client client = clientService.findByEmail(subject);
 
         String accessToken = jwtProvider.generateTokenForClient(client, false);
         String newRefreshToken = isRefresh ? jwtProvider.generateTokenForClient(client, true) : null;
 
         return new AuthResponse(accessToken, newRefreshToken);
+    }
+
+    @Override
+    public String verifyByToken(String token) {
+        String subject = jwtProvider.extractAccessClaims(token).getSubject();
+        Client client = clientService.findByEmail(subject);
+
+        client.setIsVerified(true);
+        clientService.save(client);
+
+        return "Account is verified";
     }
 
     @Override

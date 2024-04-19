@@ -25,7 +25,7 @@ public class CompanyServiceImpl implements CompanyService {
 
     @Override
     public Company create(CompanyCreateDto dto) {
-        isClient();
+        clientService.isVerifiedClient();
         isUniqueName(dto.getName());
 
         Client owner = clientService.findByEmail(clientAuthService.getAuthInfo().getEmail());
@@ -49,7 +49,7 @@ public class CompanyServiceImpl implements CompanyService {
     public Company addClient(Long companyId, String email) {
         Company company = findById(companyId);
 
-        isClient();
+        clientService.isVerifiedClient();
         isAdmin(company);
 
         Client client = clientService.findByEmail(email);
@@ -68,7 +68,7 @@ public class CompanyServiceImpl implements CompanyService {
     public Company removeClient(Long companyId, String email) {
         Company company = findById(companyId);
 
-        isClient();
+        clientService.isVerifiedClient();
         isAdmin(company);
 
         Client client = clientService.findByEmail(email);
@@ -99,7 +99,7 @@ public class CompanyServiceImpl implements CompanyService {
     public Company updateDescription(Long companyId, String description) {
         Company company = findById(companyId);
 
-        isClient();
+        clientService.isVerifiedClient();
         isAdmin(company);
 
         company.setDescription(description);
@@ -111,7 +111,7 @@ public class CompanyServiceImpl implements CompanyService {
     public String delete(Long companyId) {
         Company company = findById(companyId);
 
-        isClient();
+        clientService.isVerifiedClient();
         isAdmin(company);
 
         for (Client client: company.getClients()) {
@@ -121,14 +121,6 @@ public class CompanyServiceImpl implements CompanyService {
 
         companyRepository.delete(company);
         return "Company was deleted successfully.";
-    }
-
-    private void isClient() {
-        boolean isClient = clientAuthService.getAuthInfo().isClient();
-
-        if (!isClient) {
-            throw new ResourceForbiddenException("This feature is not allowed for agents");
-        }
     }
 
     private void isUniqueName(String name) {

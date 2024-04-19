@@ -37,7 +37,7 @@ public class MeetingServiceImpl implements MeetingService {
 
     @Override
     public Meeting create(MeetingCreateDto dto) {
-        isClient();
+        clientService.isVerifiedClient();
         Client client = clientService.findByEmail(clientAuthService.getAuthInfo().getEmail());
 
         if (!client.getRole().equals(Role.ADMIN)) {
@@ -94,7 +94,7 @@ public class MeetingServiceImpl implements MeetingService {
 
     @Override
     public Meeting changeStreet(Long meetingId, String street) {
-        isClient();
+        clientService.isVerifiedClient();
         Meeting meeting = findById(meetingId);
         isCompanyAdmin(meeting);
 
@@ -108,7 +108,7 @@ public class MeetingServiceImpl implements MeetingService {
 
     @Override
     public Meeting changeHouseNumber(Long meetingId, String houseNumber) {
-        isClient();
+        clientService.isVerifiedClient();
         Meeting meeting = findById(meetingId);
         isCompanyAdmin(meeting);
 
@@ -122,7 +122,7 @@ public class MeetingServiceImpl implements MeetingService {
 
     @Override
     public Meeting changeDeal(Long meetingId, String dealType) {
-        isClient();
+        clientService.isVerifiedClient();
         Meeting meeting = findById(meetingId);
         isCompanyAdmin(meeting);
 
@@ -140,7 +140,7 @@ public class MeetingServiceImpl implements MeetingService {
 
     @Override
     public List<Meeting> findAllScheduledMeetings() {
-        isClient();
+        clientService.isVerifiedClient();
         Client client = clientService.findByEmail(clientAuthService.getAuthInfo().getEmail());
 
         return meetingRepository.findAllByStatusAndClientsContaining(Status.IN_WAITING, client);
@@ -198,14 +198,6 @@ public class MeetingServiceImpl implements MeetingService {
 
     private String getTimeInStringFormat(int h, int m) {
         return h + ":" + (m < 10 ? "0" + m : m);
-    }
-
-    private void isClient() {
-        boolean isClient = clientAuthService.getAuthInfo().isClient();
-
-        if (!isClient) {
-            throw new ResourceForbiddenException("This feature is not allowed for agents");
-        }
     }
 
     private Agent getFreeAgent(Instant date, String city) {

@@ -64,7 +64,7 @@ public class JwtProvider {
         return extractAllClaims(jwtToken, accessToken);
     }
 
-    public Claims extractRefreshToken(String jwtToken) {
+    public Claims extractRefreshClaims(String jwtToken) {
         return extractAllClaims(jwtToken, refreshToken);
     }
 

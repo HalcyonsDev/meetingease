@@ -5,10 +5,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 import ru.halcyon.meetingease.dto.ClientRegisterDto;
 import ru.halcyon.meetingease.security.AuthRequest;
@@ -29,6 +26,12 @@ public class ClientAuthController {
         }
 
         AuthResponse response = clientAuthService.register(dto);
+        return ResponseEntity.ok(response);
+    }
+
+    @GetMapping
+    public ResponseEntity<String> confirmEmail(@RequestParam String token) {
+        String response = clientAuthService.verifyByToken(token);
         return ResponseEntity.ok(response);
     }
 

@@ -12,6 +12,7 @@ CREATE TABLE IF NOT EXISTS clients(
     role VARCHAR(5),
     password VARCHAR(100) NOT NULL,
     photo VARCHAR(100),
+    is_verified BOOLEAN NOT NULL,
     company_id BIGINT,
     FOREIGN KEY (company_id) REFERENCES companies(id)
 )

@@ -40,6 +40,9 @@ public class Client extends BaseModel {
     @Column(name = "photo")
     private String photo;
 
+    @Column(name = "is_verified")
+    private Boolean isVerified;
+
     @ManyToOne
     @JoinColumn(name = "company_id", referencedColumnName = "id")
     @JsonBackReference

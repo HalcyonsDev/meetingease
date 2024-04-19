@@ -1,0 +1,27 @@
+version: "1.0"
+
+services:
+  meetingease-app:
+    container_name: meetingease
+    image: meetingease
+    ports:
+      - "8080:8080"
+    networks:
+      - meetingease-network
+
+  meetingease-db:
+    container_name: meetingease-db
+    image: postgres
+    environment:
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: meeting_ease
+    ports:
+      - "5432:5432"
+    networks:
+      - meetingease-network
+volumes:
+  meetingease-db:
+
+networks:
+  meetingease-network:
+    driver: bridge
