@@ -26,6 +26,12 @@ public class Meeting extends BaseModel {
     @Column(name = "city")
     private String city;
 
+    @Column(name = "street")
+    private String street;
+
+    @Column(name = "house_number")
+    private String houseNumber;
+
     @Column(name = "status")
     @Enumerated(EnumType.STRING)
     private Status status;

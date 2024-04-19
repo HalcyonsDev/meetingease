@@ -1,6 +1,7 @@
 package ru.halcyon.meetingease.controller;
 
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.Size;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -39,6 +40,36 @@ public class MeetingController {
     @PostMapping("/{meetingId}/complete")
     public ResponseEntity<Meeting> complete(@PathVariable Long meetingId) {
         Meeting meeting = meetingService.complete(meetingId);
+        return ResponseEntity.ok(meeting);
+    }
+
+    @PatchMapping("/{meetingId}/change-street")
+    public ResponseEntity<Meeting> changeStreet(
+            @PathVariable Long meetingId,
+            @RequestParam
+            @Size(min = 1, max = 100, message = "Street must be more than 1 character and less than 100 characters.") String value
+    ) {
+        Meeting meeting = meetingService.changeStreet(meetingId, value);
+        return ResponseEntity.ok(meeting);
+    }
+
+    @PatchMapping("/{meetingId}/change-house")
+    public ResponseEntity<Meeting> changeHouseNumber(
+            @PathVariable Long meetingId,
+            @RequestParam
+            @Size(min = 1, max = 20, message = "House number must be more than 1 character and less than 20 characters.") String value
+    ) {
+        Meeting meeting = meetingService.changeHouseNumber(meetingId, value);
+        return ResponseEntity.ok(meeting);
+    }
+
+    @PatchMapping("/{meetingId}/change-deal")
+    public ResponseEntity<Meeting> changeDeal(
+            @PathVariable Long meetingId,
+            @RequestParam
+            @Size(min = 1, max = 100, message = "Deal type must be more than 1 character and less than 100 characters.") String value
+    ) {
+        Meeting meeting = meetingService.changeDeal(meetingId, value);
         return ResponseEntity.ok(meeting);
     }
 

@@ -13,19 +13,20 @@ import org.springframework.test.context.DynamicPropertySource;
 import org.testcontainers.containers.PostgreSQLContainer;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
+import ru.halcyon.meetingease.dto.CompanyCreateDto;
 import ru.halcyon.meetingease.dto.MeetingCreateDto;
 import ru.halcyon.meetingease.exception.ResourceNotFoundException;
 import ru.halcyon.meetingease.exception.WrongDataException;
 import ru.halcyon.meetingease.model.Client;
+import ru.halcyon.meetingease.model.Deal;
 import ru.halcyon.meetingease.model.Meeting;
 import ru.halcyon.meetingease.model.support.Role;
-import ru.halcyon.meetingease.repository.AgentRepository;
 import ru.halcyon.meetingease.repository.ClientRepository;
+import ru.halcyon.meetingease.repository.CompanyRepository;
 import ru.halcyon.meetingease.repository.DealRepository;
 import ru.halcyon.meetingease.repository.MeetingRepository;
 import ru.halcyon.meetingease.security.JwtAuthentication;
-import ru.halcyon.meetingease.service.agent.AgentService;
-import ru.halcyon.meetingease.service.client.ClientService;
+import ru.halcyon.meetingease.service.company.CompanyService;
 import ru.halcyon.meetingease.service.meeting.MeetingService;
 
 import java.time.Instant;
@@ -49,19 +50,16 @@ public class MeetingServiceTests {
     private ClientRepository clientRepository;
 
     @Autowired
-    private AgentRepository agentRepository;
+    private DealRepository dealRepository;
 
     @Autowired
-    private DealRepository dealRepository;
+    private CompanyRepository companyRepository;
 
     @Autowired
     private MeetingService meetingService;
 
     @Autowired
-    private ClientService clientService;
-
-    @Autowired
-    private AgentService agentService;
+    private CompanyService companyService;
 
     @DynamicPropertySource
     static void configureProperties(DynamicPropertyRegistry registry) {
@@ -82,8 +80,9 @@ public class MeetingServiceTests {
 
     @BeforeEach
     void setUp() {
-        clientRepository.deleteAll();
         meetingRepository.deleteAll();
+        clientRepository.deleteAll();
+        companyRepository.deleteAll();
     }
 
     @Test
@@ -121,12 +120,63 @@ public class MeetingServiceTests {
         JwtAuthentication jwtAuthentication = new JwtAuthentication(true, client.getEmail(), true);
         SecurityContextHolder.getContext().setAuthentication(jwtAuthentication);
 
-        meetingService.create(new MeetingCreateDto(getDate(19, 10, 0), "казань", "бауман", "31/12", "Кредитование"));
-        meetingService.create(new MeetingCreateDto(getDate(19, 17, 30), "казань", "бауман", "31/12", "Кредитование"));
-        meetingService.create(new MeetingCreateDto(getDate(20, 10, 30), "казань", "бауман", "31/12", "Кредитование"));
+        meetingService.create(new MeetingCreateDto(getDate(23, 10, 0), "казань", "бауман", "31/12", "Кредитование"));
+        meetingService.create(new MeetingCreateDto(getDate(23, 17, 30), "казань", "бауман", "31/12", "Кредитование"));
+        meetingService.create(new MeetingCreateDto(getDate(24, 10, 30), "казань", "бауман", "31/12", "Кредитование"));
 
-        System.out.println(meetingRepository.findAll());
         meetingService.getFreeDatesForWeek("Казань");
+    }
+
+    @Test
+    void changeStreet() {
+        Client client = createClient("test_email@gmail.com");
+        String newDisplayName = "12, улица Лобачевского, Вахитовский район, Казань, городской округ Казань, Татарстан, Приволжский федеральный округ, 420111, Россия";
+        String newStreet = "улица Лобачевского";
+
+        JwtAuthentication jwtAuthentication = new JwtAuthentication(true, client.getEmail(), true);
+        SecurityContextHolder.getContext().setAuthentication(jwtAuthentication);
+
+        companyService.create(new CompanyCreateDto("test_name", "test_description"));
+
+        Meeting meeting = meetingService.create(new MeetingCreateDto(getDate(19, 10, 0), "казань", "кремлевская", "12", "Кредитование"));
+        meeting = meetingService.changeStreet(meeting.getId(), "лобачевского");
+
+        assertThat(meeting.getStreet()).isEqualTo(newStreet);
+        assertThat(meeting.getAddress()).isEqualTo(newDisplayName);
+    }
+
+    @Test
+    void changeHouseNumber() {
+        Client client = createClient("test_email@gmail.com");
+        String newDisplayName = "Министерство строительства, архитектуры и ЖКХ Республики Татарстан, 13, Кремлёвская улица, Вахитовский район, Казань, городской округ Казань, Татарстан, Приволжский федеральный округ, 420111, Россия";
+        String newHouseNumber = "13";
+
+        JwtAuthentication jwtAuthentication = new JwtAuthentication(true, client.getEmail(), true);
+        SecurityContextHolder.getContext().setAuthentication(jwtAuthentication);
+
+        companyService.create(new CompanyCreateDto("test_name", "test_description"));
+
+        Meeting meeting = meetingService.create(new MeetingCreateDto(getDate(19, 10, 0), "казань", "кремлевская", "12", "Кредитование"));
+        meeting = meetingService.changeHouseNumber(meeting.getId(), newHouseNumber);
+
+        assertThat(meeting.getHouseNumber()).isEqualTo(newHouseNumber);
+        assertThat(meeting.getAddress()).isEqualTo(newDisplayName);
+    }
+
+    @Test
+    void changeDeal() {
+        Client client = createClient("test_email@gmail.com");
+        Deal deal = dealRepository.findByType("Открытие банковского счёта").get();
+
+        JwtAuthentication jwtAuthentication = new JwtAuthentication(true, client.getEmail(), true);
+        SecurityContextHolder.getContext().setAuthentication(jwtAuthentication);
+
+        companyService.create(new CompanyCreateDto("test_name", "test_description"));
+
+        Meeting meeting = meetingService.create(new MeetingCreateDto(getDate(19, 10, 0), "казань", "кремлевская", "12", "Кредитование"));
+        meeting = meetingService.changeDeal(meeting.getId(), "Открытие банковского счёта");
+
+        assertThat(meeting.getDeal()).isEqualTo(deal);
     }
 
     private Client createClient(String email) {

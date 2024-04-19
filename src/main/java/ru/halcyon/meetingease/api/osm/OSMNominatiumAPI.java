@@ -1,9 +1,8 @@
-package ru.halcyon.meetingease.api.dadata;
+package ru.halcyon.meetingease.api.osm;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.*;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
@@ -35,12 +34,18 @@ public class OSMNominatiumAPI {
             isValid(jsonNode);
 
             JsonNode addressJSON = jsonNode.get(0).get("address");
+            String addressRegion = addressJSON.get("region").toString();
+            String addressCity = addressJSON.get("city").toString();
+            String addressStreet = addressJSON.get("road").toString();
+            String addressHouseNumber = addressJSON.get("house_number").toString();
+            String displayName = jsonNode.get(0).get("display_name").toString();
+
             Address address = Address.builder()
-                    .region(addressJSON.get("region").toString())
-                    .city(addressJSON.get("city").toString())
-                    .street(addressJSON.get("road").toString())
-                    .houseNumber(addressJSON.get("city").toString())
-                    .displayName(jsonNode.get(0).get("display_name").toString())
+                    .region(addressRegion.substring(1, addressRegion.length() - 1))
+                    .city(addressCity.substring(1, addressCity.length() - 1))
+                    .street(addressStreet.substring(1, addressStreet.length() - 1))
+                    .houseNumber(addressHouseNumber.substring(1, addressHouseNumber.length() - 1))
+                    .displayName(displayName.substring(1, displayName.length() - 1))
                     .build();
 
             return address;

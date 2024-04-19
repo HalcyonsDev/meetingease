@@ -10,6 +10,11 @@ public interface MeetingService {
     Meeting create(MeetingCreateDto dto);
     Meeting cancel(Long meetingId);
     Meeting complete(Long meetingId);
+
+    Meeting changeStreet(Long meetingId, String street);
+    Meeting changeHouseNumber(Long meetingId, String houseNumber);
+    Meeting changeDeal(Long meetingId, String dealType);
+
     Meeting findById(Long meetingId);
     List<Meeting> findAllScheduledMeetings();
     Map<Integer, List<String>> getFreeDatesForWeek(String city);

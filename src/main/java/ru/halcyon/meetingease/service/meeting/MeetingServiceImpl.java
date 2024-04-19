@@ -2,7 +2,7 @@ package ru.halcyon.meetingease.service.meeting;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-import ru.halcyon.meetingease.api.dadata.OSMNominatiumAPI;
+import ru.halcyon.meetingease.api.osm.OSMNominatiumAPI;
 import ru.halcyon.meetingease.dto.MeetingCreateDto;
 import ru.halcyon.meetingease.exception.ResourceForbiddenException;
 import ru.halcyon.meetingease.exception.ResourceNotFoundException;
@@ -53,11 +53,9 @@ public class MeetingServiceImpl implements MeetingService {
             throw new WrongDataException("Agents are available only from 8:00 to 18:00");
         }
 
-        Deal deal = dealRepository.findByType(dto.getDealType())
-                .orElseThrow(() -> new ResourceNotFoundException("Deal with this type not found."));
+        Deal deal = findDealByType(dto.getDealType());
         Address address = osmNominatiumAPI.getCorrectAddress(dto.getCity(), dto.getStreet(), dto.getHouseNumber());
-        String city = address.getCity().substring(1, address.getCity().length() - 1);
-        Agent freeAgent = getFreeAgent(dto.getDate(), city);
+        Agent freeAgent = getFreeAgent(dto.getDate(), address.getCity());
 
         if (freeAgent == null) {
             throw new WrongDataException("Unfortunately, there are no agents available at the moment.");
@@ -67,7 +65,9 @@ public class MeetingServiceImpl implements MeetingService {
                 .date(dto.getDate())
                 .address(address.getDisplayName())
                 .agent(freeAgent)
-                .city(city)
+                .city(address.getCity())
+                .street(address.getStreet())
+                .houseNumber(address.getHouseNumber())
                 .deal(deal)
                 .clients(List.of(client))
                 .status(Status.IN_WAITING)
@@ -88,6 +88,46 @@ public class MeetingServiceImpl implements MeetingService {
     public Meeting complete(Long meetingId) {
         Meeting meeting = findById(meetingId);
         meeting.setStatus(Status.COMPLETED);
+
+        return meetingRepository.save(meeting);
+    }
+
+    @Override
+    public Meeting changeStreet(Long meetingId, String street) {
+        isClient();
+        Meeting meeting = findById(meetingId);
+        isCompanyAdmin(meeting);
+
+        Address address = osmNominatiumAPI.getCorrectAddress(meeting.getCity(), street, meeting.getHouseNumber());
+
+        meeting.setAddress(address.getDisplayName());
+        meeting.setStreet(address.getStreet());
+
+        return meetingRepository.save(meeting);
+    }
+
+    @Override
+    public Meeting changeHouseNumber(Long meetingId, String houseNumber) {
+        isClient();
+        Meeting meeting = findById(meetingId);
+        isCompanyAdmin(meeting);
+
+        Address address = osmNominatiumAPI.getCorrectAddress(meeting.getCity(), meeting.getStreet(), houseNumber);
+
+        meeting.setAddress(address.getDisplayName());
+        meeting.setHouseNumber(address.getHouseNumber());
+
+        return meetingRepository.save(meeting);
+    }
+
+    @Override
+    public Meeting changeDeal(Long meetingId, String dealType) {
+        isClient();
+        Meeting meeting = findById(meetingId);
+        isCompanyAdmin(meeting);
+
+        Deal deal = findDealByType(dealType);
+        meeting.setDeal(deal);
 
         return meetingRepository.save(meeting);
     }
@@ -146,7 +186,6 @@ public class MeetingServiceImpl implements MeetingService {
             String time = getTimeInStringFormat(date.getHour(), date.getMinute());
 
             List<String> meetingDates = dates.get(day);
-            System.out.println(day + " " + time + " " + meetingDates);
 
             if (meetingDates.contains(time)) {
                 meetingDates.remove(time);
@@ -193,5 +232,18 @@ public class MeetingServiceImpl implements MeetingService {
         }
 
         return null;
+    }
+
+    private void isCompanyAdmin(Meeting meeting) {
+        Client client = clientService.findByEmail(clientAuthService.getAuthInfo().getEmail());
+
+        if (!client.getRole().equals(Role.ADMIN) || !meeting.getClients().get(0).getCompany().equals(client.getCompany())) {
+            throw new ResourceForbiddenException("You don't have the rights to change this meeting.");
+        }
+    }
+
+    private Deal findDealByType(String dealType) {
+        return dealRepository.findByType(dealType)
+                .orElseThrow(() -> new ResourceNotFoundException("Deal with this type not found."));
     }
 }
