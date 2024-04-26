@@ -3,7 +3,7 @@ package ru.halcyon.meetingease.model;
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
 import lombok.*;
-import ru.halcyon.meetingease.model.support.Role;
+import ru.halcyon.meetingease.support.Role;
 
 import java.util.List;
 

@@ -15,12 +15,11 @@ import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
 import ru.halcyon.meetingease.dto.CompanyCreateDto;
 import ru.halcyon.meetingease.dto.MeetingCreateDto;
-import ru.halcyon.meetingease.exception.ResourceNotFoundException;
 import ru.halcyon.meetingease.exception.WrongDataException;
 import ru.halcyon.meetingease.model.Client;
 import ru.halcyon.meetingease.model.Deal;
 import ru.halcyon.meetingease.model.Meeting;
-import ru.halcyon.meetingease.model.support.Role;
+import ru.halcyon.meetingease.support.Role;
 import ru.halcyon.meetingease.repository.ClientRepository;
 import ru.halcyon.meetingease.repository.CompanyRepository;
 import ru.halcyon.meetingease.repository.DealRepository;
@@ -188,6 +187,7 @@ public class MeetingServiceTests {
                         .password("test_password")
                         .position("test_position")
                         .phoneNumber("test_number")
+                        .isVerified(true)
                         .role(Role.ADMIN)
                         .photo("test_photo")
                         .build()

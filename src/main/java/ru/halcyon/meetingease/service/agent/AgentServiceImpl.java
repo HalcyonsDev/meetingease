@@ -24,6 +24,12 @@ public class AgentServiceImpl implements AgentService {
     }
 
     @Override
+    public Agent findById(Long agentId) {
+        return agentRepository.findById(agentId)
+            .orElseThrow(() -> new ResourceNotFoundException("Agent with this id not found."));   
+    }
+
+    @Override
     public Agent findByEmail(String email) {
         return agentRepository.findByEmail(email)
                 .orElseThrow(() -> new ResourceNotFoundException("Agent with this email not found."));

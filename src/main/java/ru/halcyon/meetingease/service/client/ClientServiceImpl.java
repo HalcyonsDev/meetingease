@@ -25,9 +25,15 @@ public class ClientServiceImpl implements ClientService {
     }
 
     @Override
+    public Client findById(Long clientId) {
+        return clientRepository.findById(clientId)
+                .orElseThrow(() -> new ResourceNotFoundException("Client with this id not found."));
+    }
+
+    @Override
     public Client findByEmail(String email) {
         return clientRepository.findByEmail(email)
-                .orElseThrow(() -> new ResourceNotFoundException("Client with this email is not found."));
+                .orElseThrow(() -> new ResourceNotFoundException("Client with this email not found."));
     }
 
     @Override

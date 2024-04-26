@@ -1,6 +1,8 @@
 package ru.halcyon.meetingease.service.meeting;
 
 import ru.halcyon.meetingease.dto.MeetingCreateDto;
+import ru.halcyon.meetingease.model.Agent;
+import ru.halcyon.meetingease.model.Client;
 import ru.halcyon.meetingease.model.Meeting;
 
 import java.util.List;
@@ -18,4 +20,6 @@ public interface MeetingService {
     Meeting findById(Long meetingId);
     List<Meeting> findAllScheduledMeetings();
     Map<Integer, List<String>> getFreeDatesForWeek(String city);
+
+    Boolean existsByAgentAndClient(Agent agent, Client client);
 }

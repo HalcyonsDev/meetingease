@@ -17,7 +17,7 @@ import ru.halcyon.meetingease.dto.CompanyCreateDto;
 import ru.halcyon.meetingease.exception.ResourceNotFoundException;
 import ru.halcyon.meetingease.model.Client;
 import ru.halcyon.meetingease.model.Company;
-import ru.halcyon.meetingease.model.support.Role;
+import ru.halcyon.meetingease.support.Role;
 import ru.halcyon.meetingease.repository.ClientRepository;
 import ru.halcyon.meetingease.repository.CompanyRepository;
 import ru.halcyon.meetingease.security.JwtAuthentication;
@@ -171,6 +171,7 @@ public class CompanyServiceTests {
                         .password("test_password")
                         .position("test_position")
                         .phoneNumber("test_number")
+                        .isVerified(true)
                         .role(Role.ADMIN)
                         .photo("test_photo")
                         .build()

@@ -10,7 +10,7 @@ import ru.halcyon.meetingease.exception.ResourceForbiddenException;
 import ru.halcyon.meetingease.exception.ResourceNotFoundException;
 import ru.halcyon.meetingease.model.Client;
 import ru.halcyon.meetingease.model.Company;
-import ru.halcyon.meetingease.model.support.Role;
+import ru.halcyon.meetingease.support.Role;
 import ru.halcyon.meetingease.repository.CompanyRepository;
 import ru.halcyon.meetingease.service.auth.client.ClientAuthService;
 import ru.halcyon.meetingease.service.client.ClientService;

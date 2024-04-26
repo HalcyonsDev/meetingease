@@ -53,6 +53,7 @@ public class AgentAuthServiceImpl implements AgentAuthService {
         return new AuthResponse(accessToken, refreshToken);
     }
 
+    @Override
     public JwtAuthentication getAuthInfo() {
         return (JwtAuthentication) SecurityContextHolder.getContext().getAuthentication();
     }

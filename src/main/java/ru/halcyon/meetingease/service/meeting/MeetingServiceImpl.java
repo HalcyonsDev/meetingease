@@ -11,9 +11,9 @@ import ru.halcyon.meetingease.model.Agent;
 import ru.halcyon.meetingease.model.Client;
 import ru.halcyon.meetingease.model.Deal;
 import ru.halcyon.meetingease.model.Meeting;
-import ru.halcyon.meetingease.model.support.Address;
-import ru.halcyon.meetingease.model.support.Role;
-import ru.halcyon.meetingease.model.support.Status;
+import ru.halcyon.meetingease.support.Address;
+import ru.halcyon.meetingease.support.Role;
+import ru.halcyon.meetingease.support.Status;
 import ru.halcyon.meetingease.repository.DealRepository;
 import ru.halcyon.meetingease.repository.MeetingRepository;
 import ru.halcyon.meetingease.service.agent.AgentService;
@@ -194,6 +194,11 @@ public class MeetingServiceImpl implements MeetingService {
         }
 
         return dates;
+    }
+
+    @Override
+    public Boolean existsByAgentAndClient(Agent agent, Client client) {
+        return meetingRepository.existsByAgentAndClientsContainingAndStatus(agent, client, Status.IN_WAITING);
     }
 
     private String getTimeInStringFormat(int h, int m) {

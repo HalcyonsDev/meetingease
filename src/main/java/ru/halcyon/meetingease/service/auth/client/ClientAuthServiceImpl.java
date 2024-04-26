@@ -9,7 +9,7 @@ import ru.halcyon.meetingease.exception.ResourceAlreadyExistsException;
 import ru.halcyon.meetingease.exception.TokenValidationException;
 import ru.halcyon.meetingease.exception.WrongDataException;
 import ru.halcyon.meetingease.model.Client;
-import ru.halcyon.meetingease.model.support.Role;
+import ru.halcyon.meetingease.support.Role;
 import ru.halcyon.meetingease.security.AuthRequest;
 import ru.halcyon.meetingease.security.AuthResponse;
 import ru.halcyon.meetingease.security.JwtAuthentication;

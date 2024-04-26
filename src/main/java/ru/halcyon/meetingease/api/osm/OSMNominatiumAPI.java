@@ -7,7 +7,7 @@ import org.springframework.http.*;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
 import ru.halcyon.meetingease.exception.WrongDataException;
-import ru.halcyon.meetingease.model.support.Address;
+import ru.halcyon.meetingease.support.Address;
 
 @Component
 public class OSMNominatiumAPI {

@@ -8,7 +8,7 @@ VALUES ('Кредитование', '["Удостоверение личност
        ('Оформление аренды', '["Удостоверение личности (паспорт)", "Документы о доходах", "Справка о трудоустройстве"]');
 
 INSERT INTO agents (name, surname, email, phone_number, city, password, photo)
-VALUES ('Иван', 'Иванов', 'ivan.ivanov@example.com', '+1234567890', 'Казань', 'ExamplePassword123', 'avatar.jpg'),
-       ('Анна', 'Петрова', 'ann.petrova@example.com', '+1987654321', 'Казань', 'ExamplePassword123', 'avatar.jpg'),
-       ('Петр', 'Сидоров', 'petr.sidorov@example.com', '+198723421', 'Санкт-Петербург', 'ExamplePassword123', 'avatar.jpg'),
-       ('Майкл', 'Смирнов', 'michael.smirnov@example.com', '+138121231', 'Екатеринбург', 'ExamplePassword123', 'avatar.jpg');
+VALUES ('Иван', 'Иванов', 'ivan.ivanov@example.com', '+1234567890', 'Казань', '$2a$12$EGV.KfWGUUqh7ERopErjpuPC3PYXJvnuGLoChE6cXk0mV9Lfcj/EG', 'avatar.jpg'),
+       ('Анна', 'Петрова', 'ann.petrova@example.com', '+1987654321', 'Казань', '$2a$12$EGV.KfWGUUqh7ERopErjpuPC3PYXJvnuGLoChE6cXk0mV9Lfcj/EG', 'avatar.jpg'),
+       ('Петр', 'Сидоров', 'petr.sidorov@example.com', '+198723421', 'Санкт-Петербург', '$2a$12$EGV.KfWGUUqh7ERopErjpuPC3PYXJvnuGLoChE6cXk0mV9Lfcj/EG', 'avatar.jpg'),
+       ('Майкл', 'Смирнов', 'michael.smirnov@example.com', '+138121231', 'Екатеринбург', '$2a$12$EGV.KfWGUUqh7ERopErjpuPC3PYXJvnuGLoChE6cXk0mV9Lfcj/EG', 'avatar.jpg');
