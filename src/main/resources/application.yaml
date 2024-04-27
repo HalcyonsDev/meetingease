@@ -18,8 +18,8 @@ spring:
     protocol: smtp
     host: smtp.gmail.com
     port: 587
-    username: halcyon.ruslan@gmail.com
-    password: hifl fxfp brqz oavf
+    username: meetingease@gmail.com
+    password: password
     default-encoding: UTF-8
     properties:
       mail:
