@@ -147,7 +147,7 @@ public class MeetingServiceTests {
     @Test
     void changeHouseNumber() {
         Client client = createClient("test_email@gmail.com");
-        String newDisplayName = "Министерство строительства, архитектуры и ЖКХ Республики Татарстан, 13, Кремлёвская улица, Вахитовский район, Казань, городской округ Казань, Татарстан, Приволжский федеральный округ, 420111, Россия";
+        String newDisplayName = "13, Кремлёвская улица, Вахитовский район, Казань, городской округ Казань, Татарстан, Приволжский федеральный округ, 420111, Россия";
         String newHouseNumber = "13";
 
         JwtAuthentication jwtAuthentication = new JwtAuthentication(true, client.getEmail(), true);

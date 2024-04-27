@@ -6,7 +6,7 @@ spring:
     enabled: true
   
   datasource:
-    url: jdbc:postgresql://localhost:5432/meeting_ease
+    url: jdbc:postgresql://postgres:5433/meeting_ease
     username: postgres
     password: password
 

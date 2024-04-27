@@ -6,6 +6,9 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.hibernate.annotations.CreationTimestamp;
+
+import java.time.Instant;
 
 @Entity
 @Table(name = "chat_messages")
@@ -15,6 +18,10 @@ import lombok.Setter;
 @NoArgsConstructor
 @AllArgsConstructor
 public class ChatMessage extends BaseModel {
+    @Column(name = "created_at")
+    @CreationTimestamp
+    private Instant createdAt;
+
     @Column(name = "content")
     private String content;
 
