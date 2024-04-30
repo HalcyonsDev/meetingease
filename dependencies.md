@@ -38,6 +38,12 @@ Dependency: `implementation 'org.springframework.boot:spring-boot-starter-websoc
 
 Spring Boot Starter WebSocket is a module provided by the Spring Boot framework that simplifies the integration of WebSocket functionality into Spring Boot applications. WebSocket is a protocol that provides full-duplex communication channels over a single TCP connection, allowing real-time bidirectional communication between clients and servers. We use it for chat.
 
+## Springdoc OpenAPI Starter Webmvc
+
+Dependency: `implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.5.0'`
+
+Dependency provides integration of OpenAPI and Swagger UI into Spring Boot applications.
+
 ## Spring Boot Starter Test
 
 Dependency: `testImplementation 'org.springframework.boot:spring-boot-starter-test'`
