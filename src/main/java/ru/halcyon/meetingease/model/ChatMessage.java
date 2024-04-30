@@ -17,7 +17,12 @@ import java.time.Instant;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class ChatMessage extends BaseModel {
+public class ChatMessage {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "id")
+    private Long id;
+
     @Column(name = "created_at")
     @CreationTimestamp
     private Instant createdAt;

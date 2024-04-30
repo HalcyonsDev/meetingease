@@ -40,7 +40,7 @@ public class MeetingServiceImpl implements MeetingService {
         clientService.isVerifiedClient();
         Client client = clientService.findByEmail(clientAuthService.getAuthInfo().getEmail());
 
-        if (!client.getRole().equals(Role.ADMIN)) {
+        if (client.getRole() == Role.USER) {
             throw new ResourceForbiddenException("You don't have the rights to create a meeting.");
         }
 
@@ -55,16 +55,16 @@ public class MeetingServiceImpl implements MeetingService {
 
         Deal deal = findDealByType(dto.getDealType());
         Address address = osmNominatiumAPI.getCorrectAddress(dto.getCity(), dto.getStreet(), dto.getHouseNumber());
-        Agent freeAgent = getFreeAgent(dto.getDate(), address.getCity());
+        Optional<Agent> freeAgent = getFreeAgent(dto.getDate(), address.getCity());
 
-        if (freeAgent == null) {
+        if (freeAgent.isEmpty()) {
             throw new WrongDataException("Unfortunately, there are no agents available at the moment.");
         }
 
         Meeting meeting = Meeting.builder()
                 .date(dto.getDate())
                 .address(address.getDisplayName())
-                .agent(freeAgent)
+                .agent(freeAgent.get())
                 .city(address.getCity())
                 .street(address.getStreet())
                 .houseNumber(address.getHouseNumber())
@@ -79,6 +79,7 @@ public class MeetingServiceImpl implements MeetingService {
     @Override
     public Meeting cancel(Long meetingId) {
         Meeting meeting = findById(meetingId);
+        isCompanyAdmin(meeting);
         meeting.setStatus(Status.CANCELLED);
 
         return meetingRepository.save(meeting);
@@ -87,6 +88,7 @@ public class MeetingServiceImpl implements MeetingService {
     @Override
     public Meeting complete(Long meetingId) {
         Meeting meeting = findById(meetingId);
+        isCompanyAdmin(meeting);
         meeting.setStatus(Status.COMPLETED);
 
         return meetingRepository.save(meeting);
@@ -148,36 +150,8 @@ public class MeetingServiceImpl implements MeetingService {
 
     @Override
     public Map<Integer, List<String>> getFreeDatesForWeek(String city) {
-        Map<Integer, List<String>> dates = new LinkedHashMap<>();
         LocalDateTime now = LocalDateTime.now();
-        int hour = now.getHour(), minute = now.getMinute() < 30 ? 0 : 30;
-
-        boolean isFreeToday = false;
-        if (8 < hour && hour < 18) {
-            isFreeToday = true;
-            List<String> today = new ArrayList<>();
-
-            for (int h = hour; h <= 18; h++) {
-                for (int m = minute; m <= 30; m += 30) {
-                    today.add(getTimeInStringFormat(h, m));
-                }
-            }
-
-            dates.put(now.getDayOfMonth(), today);
-        }
-
-        for (int d = now.getDayOfMonth() + 1; d <= now.getDayOfMonth() + (isFreeToday ? 6 : 7); d++) {
-            List<String> day = new ArrayList<>();
-
-            for (int h = 8; h <= 18; h++) {
-                for (int m = 0; m <= 30; m += 30) {
-                    if (h == 18 && m == 30) continue;
-                    day.add(getTimeInStringFormat(h, m));
-                }
-            }
-
-            dates.put(d, day);
-        }
+        Map<Integer, List<String>> dates = getDates(now);
 
         List<Meeting> meetings = meetingRepository.findAllByCityAndStatus(city, Status.IN_WAITING);
         for (Meeting meeting: meetings) {
@@ -196,6 +170,46 @@ public class MeetingServiceImpl implements MeetingService {
         return dates;
     }
 
+    private boolean isFreeToday(int hour) {
+        return 8 < hour && hour < 18;
+    }
+
+    private Map<Integer, List<String>> getDates(LocalDateTime now) {
+        int hour = now.getHour(), minute = now.getMinute() < 30 ? 0 : 30;
+        Map<Integer, List<String>> dates = new HashMap<>();
+
+        if (8 < hour && hour < 18) {
+            List<String> today = new ArrayList<>();
+
+            for (int h = hour; h <= 18; h++) {
+                for (int m = minute; m <= 30; m += 30) {
+                    today.add(getTimeInStringFormat(h, m));
+                }
+            }
+
+            dates.put(now.getDayOfMonth(), today);
+        }
+
+        return setTimeForDates(now, dates);
+    }
+
+    private Map<Integer, List<String>> setTimeForDates(LocalDateTime now, Map<Integer, List<String>> dates) {
+        for (int d = now.getDayOfMonth() + 1; d <= now.getDayOfMonth() + (isFreeToday(now.getHour()) ? 6 : 7); d++) {
+            List<String> day = new ArrayList<>();
+
+            for (int h = 8; h <= 18; h++) {
+                for (int m = 0; m <= 30; m += 30) {
+                    if (h == 18 && m == 30) continue;
+                    day.add(getTimeInStringFormat(h, m));
+                }
+            }
+
+            dates.put(d, day);
+        }
+
+        return dates;
+    }
+
     @Override
     public Boolean existsByAgentAndClient(Agent agent, Client client) {
         return meetingRepository.existsByAgentAndClientsContainingAndStatus(agent, client, Status.IN_WAITING);
@@ -205,10 +219,8 @@ public class MeetingServiceImpl implements MeetingService {
         return h + ":" + (m < 10 ? "0" + m : m);
     }
 
-    private Agent getFreeAgent(Instant date, String city) {
-        System.out.println(city);
+    private Optional<Agent> getFreeAgent(Instant date, String city) {
         List<Agent> agents = agentService.findAllByCity(city);
-        System.out.println(agents);
 
         for (Agent agent: agents) {
             boolean isFree = true;
@@ -225,16 +237,17 @@ public class MeetingServiceImpl implements MeetingService {
                  continue;
              }
 
-             return agent;
+             return Optional.of(agent);
         }
 
-        return null;
+        return Optional.empty();
     }
 
     private void isCompanyAdmin(Meeting meeting) {
         Client client = clientService.findByEmail(clientAuthService.getAuthInfo().getEmail());
 
-        if (!client.getRole().equals(Role.ADMIN) || !meeting.getClients().get(0).getCompany().equals(client.getCompany())) {
+        System.out.println(!meeting.getClients().get(0).getCompany().equals(client.getCompany()));
+        if (client.getRole() == Role.USER || !meeting.getClients().get(0).getCompany().equals(client.getCompany())) {
             throw new ResourceForbiddenException("You don't have the rights to change this meeting.");
         }
     }

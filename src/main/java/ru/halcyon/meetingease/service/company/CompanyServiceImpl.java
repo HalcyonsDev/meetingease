@@ -132,7 +132,7 @@ public class CompanyServiceImpl implements CompanyService {
     private void isAdmin(Company company) {
         Client client = clientService.findByEmail(clientAuthService.getAuthInfo().getEmail());
 
-        if (client.getRole().equals(Role.USER) || !company.equals(client.getCompany())) {
+        if (client.getRole() == Role.USER || !company.equals(client.getCompany())) {
             throw new ResourceForbiddenException("No access for this company.");
         }
     }

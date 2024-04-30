@@ -15,11 +15,16 @@ import java.util.List;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class Company extends BaseModel {
+public class Company {
     public Company(String name, String description) {
         this.name = name;
         this.description = description;
     }
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "id")
+    private Long id;
 
     @Column(name = "name")
     private String name;

@@ -2,7 +2,7 @@ version: "1.0"
 
 services:
   postgres:
-    image: postgres
+    image: postgres:15.6
     container_name: postgres
     environment:
       POSTGRES_PASSWORD: password

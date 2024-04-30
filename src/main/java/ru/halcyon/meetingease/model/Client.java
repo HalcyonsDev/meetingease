@@ -14,7 +14,12 @@ import java.util.List;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class Client extends BaseModel {
+public class Client {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "id")
+    private Long id;
+
     @Column(name = "name")
     private String name;
 

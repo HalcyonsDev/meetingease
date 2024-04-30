@@ -16,7 +16,12 @@ import java.util.List;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class Meeting extends BaseModel {
+public class Meeting {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "id")
+    private Long id;
+
     @Column(name = "date")
     private Instant date;
 

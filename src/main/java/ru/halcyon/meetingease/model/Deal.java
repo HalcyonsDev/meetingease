@@ -17,7 +17,12 @@ import java.util.List;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class Deal extends BaseModel {
+public class Deal {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "id")
+    private Long id;
+
     @Column(name = "type")
     private String type;
 
