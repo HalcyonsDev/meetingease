@@ -1,9 +1,6 @@
 package ru.halcyon.meetingease.service;
 
-import org.junit.jupiter.api.AfterAll;
-import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -69,8 +66,8 @@ public class MeetingServiceTests {
         postgres.stop();
     }
 
-    @BeforeEach
-    void setUp() {
+    @AfterEach
+    void tearDown() {
         meetingRepository.deleteAll();
         clientRepository.deleteAll();
         companyRepository.deleteAll();
@@ -96,12 +93,17 @@ public class MeetingServiceTests {
                 new MeetingCreateDto(getDate(2, 10, 0), "казань", "бауман", "31/12", "Кредитование")
         );
 
-        assertThrows(WrongDataException.class, () -> meetingService.create(new MeetingCreateDto(getDate(2, 10, 10), "казань", "бауман", "31/12", "Кредитование")));
-        assertThrows(WrongDataException.class, () -> meetingService.create(new MeetingCreateDto(getDate(2, 10, 30), "казань", "бауман", "31/12", "Кредитование")));
+        WrongDataException ex1 = assertThrows(WrongDataException.class, () -> meetingService.create(new MeetingCreateDto(getDate(2, 10, 10), "казань", "бауман", "31/12", "Кредитование")));
+        WrongDataException ex2 = assertThrows(WrongDataException.class, () -> meetingService.create(new MeetingCreateDto(getDate(2, 10, 30), "казань", "бауман", "31/12", "Кредитование")));
+
+        assertThat(ex1.getMessage()).isEqualTo("Unfortunately, there are no agents available at the moment.");
+        assertThat(ex2.getMessage()).isEqualTo("Unfortunately, there are no agents available at the moment.");
 
         meetingService.create(new MeetingCreateDto(getDate(3, 10, 10), "казань", "бауман", "31/12", "Кредитование"));
         meetingService.create(new MeetingCreateDto(getDate(3, 10, 10), "казань", "бауман", "31/12", "Кредитование"));
-        assertThrows(WrongDataException.class, () ->  meetingService.create(new MeetingCreateDto(getDate(3, 10, 10), "казань", "бауман", "31/12", "Кредитование")));
+
+        WrongDataException ex3 = assertThrows(WrongDataException.class, () ->  meetingService.create(new MeetingCreateDto(getDate(3, 10, 10), "казань", "бауман", "31/12", "Кредитование")));
+        assertThat(ex3.getMessage()).isEqualTo("Unfortunately, there are no agents available at the moment.");
     }
 
     @Test

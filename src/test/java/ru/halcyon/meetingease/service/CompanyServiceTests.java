@@ -1,9 +1,6 @@
 package ru.halcyon.meetingease.service;
 
-import org.junit.jupiter.api.AfterAll;
-import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -55,8 +52,8 @@ public class CompanyServiceTests {
         postgres.stop();
     }
 
-    @BeforeEach
-    void setUp() {
+    @AfterEach
+    void tearDown() {
         meetingRepository.deleteAll();
         clientRepository.deleteAll();
         companyRepository.deleteAll();
