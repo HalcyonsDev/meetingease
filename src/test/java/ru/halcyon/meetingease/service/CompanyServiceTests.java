@@ -8,15 +8,15 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.test.context.DynamicPropertyRegistry;
-import org.springframework.test.context.DynamicPropertySource;
 import org.testcontainers.containers.PostgreSQLContainer;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
+import ru.halcyon.meetingease.TestPostgresContainer;
 import ru.halcyon.meetingease.dto.CompanyCreateDto;
 import ru.halcyon.meetingease.exception.ResourceNotFoundException;
 import ru.halcyon.meetingease.model.Client;
 import ru.halcyon.meetingease.model.Company;
+import ru.halcyon.meetingease.repository.MeetingRepository;
 import ru.halcyon.meetingease.support.Role;
 import ru.halcyon.meetingease.repository.ClientRepository;
 import ru.halcyon.meetingease.repository.CompanyRepository;
@@ -31,7 +31,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
 public class CompanyServiceTests {
     @Container
-    static PostgreSQLContainer<?> postgres = new PostgreSQLContainer<>("postgres:latest");
+    static PostgreSQLContainer<?> postgres = TestPostgresContainer.getInstance();
 
     @Autowired
     private CompanyRepository companyRepository;
@@ -40,14 +40,10 @@ public class CompanyServiceTests {
     private ClientRepository clientRepository;
 
     @Autowired
-    private CompanyService companyService;
+    private MeetingRepository meetingRepository;
 
-    @DynamicPropertySource
-    static void configureProperties(DynamicPropertyRegistry registry) {
-        registry.add("spring.datasource.url", postgres::getJdbcUrl);
-        registry.add("spring.datasource.username", postgres::getUsername);
-        registry.add("spring.datasource.password", postgres::getPassword);
-    }
+    @Autowired
+    private CompanyService companyService;
 
     @BeforeAll
     static void beforeAll() {
@@ -61,6 +57,7 @@ public class CompanyServiceTests {
 
     @BeforeEach
     void setUp() {
+        meetingRepository.deleteAll();
         clientRepository.deleteAll();
         companyRepository.deleteAll();
     }

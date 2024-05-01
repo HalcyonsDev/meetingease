@@ -8,11 +8,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.test.context.DynamicPropertyRegistry;
-import org.springframework.test.context.DynamicPropertySource;
 import org.testcontainers.containers.PostgreSQLContainer;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
+import ru.halcyon.meetingease.TestPostgresContainer;
 import ru.halcyon.meetingease.dto.CompanyCreateDto;
 import ru.halcyon.meetingease.dto.MeetingCreateDto;
 import ru.halcyon.meetingease.exception.WrongDataException;
@@ -40,7 +39,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
 public class MeetingServiceTests {
     @Container
-    static PostgreSQLContainer<?> postgres = new PostgreSQLContainer<>("postgres:latest");
+    static PostgreSQLContainer<?> postgres = TestPostgresContainer.getInstance();
 
     @Autowired
     private MeetingRepository meetingRepository;
@@ -59,13 +58,6 @@ public class MeetingServiceTests {
 
     @Autowired
     private CompanyService companyService;
-
-    @DynamicPropertySource
-    static void configureProperties(DynamicPropertyRegistry registry) {
-        registry.add("spring.datasource.url", postgres::getJdbcUrl);
-        registry.add("spring.datasource.username", postgres::getUsername);
-        registry.add("spring.datasource.password", postgres::getPassword);
-    }
 
     @BeforeAll
     static void beforeAll() {
