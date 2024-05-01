@@ -10,6 +10,7 @@ import org.hibernate.annotations.JdbcTypeCode;
 import org.hibernate.type.SqlTypes;
 
 import java.util.List;
+import java.util.Objects;
 
 @Entity
 @Table(name = "deals")
@@ -33,4 +34,17 @@ public class Deal {
     @OneToMany(mappedBy = "deal")
     @JsonBackReference
     private List<Meeting> meetings;
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Deal deal = (Deal) o;
+        return Objects.equals(id, deal.id);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hashCode(id);
+    }
 }

@@ -246,7 +246,6 @@ public class MeetingServiceImpl implements MeetingService {
     private void isCompanyAdmin(Meeting meeting) {
         Client client = clientService.findByEmail(clientAuthService.getAuthInfo().getEmail());
 
-        System.out.println(!meeting.getClients().get(0).getCompany().equals(client.getCompany()));
         if (client.getRole() == Role.USER || !meeting.getClients().get(0).getCompany().equals(client.getCompany())) {
             throw new ResourceForbiddenException("You don't have the rights to change this meeting.");
         }

@@ -7,10 +7,10 @@ import ru.halcyon.meetingease.support.Status;
 
 import java.time.Instant;
 import java.util.List;
+import java.util.Objects;
 
 @Entity
 @Table(name = "meetings")
-@ToString
 @Builder
 @Getter
 @Setter
@@ -59,4 +59,17 @@ public class Meeting {
     )
     @JsonManagedReference
     private List<Client> clients;
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Meeting meeting = (Meeting) o;
+        return Objects.equals(id, meeting.id);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hashCode(id);
+    }
 }

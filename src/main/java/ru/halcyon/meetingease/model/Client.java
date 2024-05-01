@@ -6,6 +6,7 @@ import lombok.*;
 import ru.halcyon.meetingease.support.Role;
 
 import java.util.List;
+import java.util.Objects;
 
 @Entity
 @Table(name = "clients")
@@ -56,4 +57,17 @@ public class Client {
     @ManyToMany(mappedBy = "clients")
     @JsonBackReference
     private List<Meeting> meetings;
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Client client = (Client) o;
+        return Objects.equals(id, client.id);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hashCode(id);
+    }
 }
