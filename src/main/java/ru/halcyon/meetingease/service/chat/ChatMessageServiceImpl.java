@@ -102,7 +102,7 @@ public class ChatMessageServiceImpl implements ChatMessageService {
 
     private void isThereMeeting(Client client, Agent agent) {
         if (!meetingService.existsByAgentAndClient(agent, client)) {
-            throw new ResourceForbiddenException("No access for chat with this agent.");
+            throw new ResourceForbiddenException("No access for chat.");
         }
     }
 
