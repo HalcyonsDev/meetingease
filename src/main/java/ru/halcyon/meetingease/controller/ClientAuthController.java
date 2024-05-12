@@ -29,7 +29,7 @@ public class ClientAuthController {
         return ResponseEntity.ok(response);
     }
 
-    @GetMapping
+    @PostMapping
     public ResponseEntity<String> confirmEmail(@RequestParam String token) {
         String response = clientAuthService.verifyByToken(token);
         return ResponseEntity.ok(response);
