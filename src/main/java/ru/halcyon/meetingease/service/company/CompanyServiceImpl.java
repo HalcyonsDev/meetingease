@@ -15,6 +15,8 @@ import ru.halcyon.meetingease.repository.CompanyRepository;
 import ru.halcyon.meetingease.service.auth.client.ClientAuthService;
 import ru.halcyon.meetingease.service.client.ClientService;
 
+import java.util.List;
+
 @Service
 @RequiredArgsConstructor
 public class CompanyServiceImpl implements CompanyService {
@@ -34,7 +36,12 @@ public class CompanyServiceImpl implements CompanyService {
             throw new ResourceAlreadyExistsException("You already have company.");
         }
 
+        if (companyRepository.existsByName(dto.getName())) {
+            throw new ResourceAlreadyExistsException("Company with this name already exists.");
+        }
+
         Company company = new Company(dto.getName(), dto.getDescription());
+        company.setClients(List.of(owner));
         company = companyRepository.save(company);
 
         owner.setRole(Role.ADMIN);
@@ -42,7 +49,7 @@ public class CompanyServiceImpl implements CompanyService {
 
         clientService.save(owner);
 
-        return findById(company.getId());
+        return company;
     }
 
     @Override
@@ -61,7 +68,9 @@ public class CompanyServiceImpl implements CompanyService {
         client.setRole(Role.USER);
         clientService.save(client);
 
-        return findById(companyId);
+        company.getClients().add(client);
+
+        return companyRepository.save(company);
     }
 
     @Override

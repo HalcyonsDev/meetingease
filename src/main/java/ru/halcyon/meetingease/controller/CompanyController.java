@@ -34,8 +34,8 @@ public class CompanyController {
         return ResponseEntity.ok(company);
     }
 
-    @DeleteMapping("/{companyId}/delete-client")
-    public ResponseEntity<Company> deleteClient(@PathVariable Long companyId, @RequestParam String email) {
+    @DeleteMapping("/{companyId}/remove-client")
+    public ResponseEntity<Company> removeClient(@PathVariable Long companyId, @RequestParam String email) {
         Company company = companyService.removeClient(companyId, email);
         return ResponseEntity.ok(company);
     }
