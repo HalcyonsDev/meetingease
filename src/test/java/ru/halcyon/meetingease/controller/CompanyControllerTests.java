@@ -180,6 +180,21 @@ public class CompanyControllerTests {
     }
 
     @Test
+    void updateDescriptionValidatesData() throws Exception {
+        createClient(OWNER_EMAIL);
+        setJwtAuth();
+        Company company = companyService.create(getCompanyDto());
+
+        mvc.perform(patch("/api/v1/companies/{companyId}/update-description", company.getId())
+                .param("value", ""))
+                .andExpect(status().is4xxClientError())
+                .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_PROBLEM_JSON))
+                .andExpect(jsonPath("title").value("Bad Request"))
+                .andExpect(jsonPath("status").value(400))
+                .andExpect(jsonPath("detail").value("Validation failure"));
+    }
+
+    @Test
     void deleteCompany() throws Exception {
         createClient(OWNER_EMAIL);
         setJwtAuth();
