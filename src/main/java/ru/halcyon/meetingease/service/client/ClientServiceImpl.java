@@ -44,7 +44,8 @@ public class ClientServiceImpl implements ClientService {
         }
 
         Client client = findByEmail(getAuthInfo().getEmail());
-        if (!client.getIsVerified()) {
+
+        if (Boolean.FALSE.equals(client.getIsVerified())) {
             throw new ResourceForbiddenException("This feature is not allowed for unverified users. Please confirm your email.");
         }
     }

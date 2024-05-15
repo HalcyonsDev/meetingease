@@ -27,7 +27,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 @SpringBootTest
 @Testcontainers
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
-public class AgentAuthServiceTests {
+class AgentAuthServiceTests {
     @Container
     static PostgreSQLContainer<?> postgres = TestPostgresContainer.getInstance();
 

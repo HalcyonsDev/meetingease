@@ -175,7 +175,8 @@ public class MeetingServiceImpl implements MeetingService {
     }
 
     private Map<Integer, List<String>> getDates(LocalDateTime now) {
-        int hour = now.getHour(), minute = now.getMinute() < 30 ? 0 : 30;
+        int hour = now.getHour();
+        int minute = now.getMinute() < 30 ? 0 : 30;
         Map<Integer, List<String>> dates = new HashMap<>();
 
         if (8 < hour && hour < 18) {

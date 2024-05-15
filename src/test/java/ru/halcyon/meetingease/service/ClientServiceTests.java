@@ -15,9 +15,9 @@ import ru.halcyon.meetingease.TestPostgresContainer;
 import ru.halcyon.meetingease.exception.ResourceForbiddenException;
 import ru.halcyon.meetingease.model.Agent;
 import ru.halcyon.meetingease.model.Client;
-import ru.halcyon.meetingease.repository.AgentRepository;
 import ru.halcyon.meetingease.repository.ClientRepository;
 import ru.halcyon.meetingease.security.JwtAuthentication;
+import ru.halcyon.meetingease.service.agent.AgentService;
 import ru.halcyon.meetingease.service.client.ClientService;
 import ru.halcyon.meetingease.support.Role;
 
@@ -27,18 +27,18 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 @SpringBootTest
 @Testcontainers
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
-public class ClientServiceTests {
+class ClientServiceTests {
     @Container
     static PostgreSQLContainer<?> postgres = TestPostgresContainer.getInstance();
-
-    @Autowired
-    private AgentRepository agentRepository;
 
     @Autowired
     private ClientRepository clientRepository;
 
     @Autowired
     private ClientService clientService;
+
+    @Autowired
+    private AgentService agentService;
 
     @BeforeAll
     static void beforeAll() {
@@ -66,8 +66,9 @@ public class ClientServiceTests {
         Client createdClient = createClient(true);
         Client receivedClient = clientService.findById(createdClient.getId());
 
-        assertThat(receivedClient).isNotNull();
-        assertThat(receivedClient).isEqualTo(createdClient);
+        assertThat(receivedClient)
+                .isNotNull()
+                .isEqualTo(createdClient);
     }
 
     @Test
@@ -75,13 +76,14 @@ public class ClientServiceTests {
         Client createdClient = createClient(true);
         Client receivedClient = clientService.findByEmail(createdClient.getEmail());
 
-        assertThat(receivedClient).isNotNull();
-        assertThat(receivedClient).isEqualTo(createdClient);
+        assertThat(receivedClient)
+                .isNotNull()
+                .isEqualTo(createdClient);
     }
 
     @Test
     void isVerifiedClient_ChecksForClient() {
-        Agent agent = agentRepository.findById(1L).get();
+        Agent agent = agentService.findById(1L);
 
         JwtAuthentication jwtAuthentication = new JwtAuthentication(true, agent.getEmail(), false);
         SecurityContextHolder.getContext().setAuthentication(jwtAuthentication);

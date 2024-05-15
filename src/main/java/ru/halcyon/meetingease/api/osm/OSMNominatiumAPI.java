@@ -40,15 +40,13 @@ public class OSMNominatiumAPI {
             String addressHouseNumber = addressJSON.get("house_number").toString();
             String displayName = jsonNode.get(0).get("display_name").toString();
 
-            Address address = Address.builder()
+            return Address.builder()
                     .region(addressRegion.substring(1, addressRegion.length() - 1))
                     .city(addressCity.substring(1, addressCity.length() - 1))
                     .street(addressStreet.substring(1, addressStreet.length() - 1))
                     .houseNumber(addressHouseNumber.substring(1, addressHouseNumber.length() - 1))
                     .displayName(displayName.substring(1, displayName.length() - 1))
                     .build();
-
-            return address;
         } catch (JsonProcessingException ex) {
             throw new RuntimeException(ex);
         }

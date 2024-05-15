@@ -25,6 +25,7 @@ import ru.halcyon.meetingease.security.AuthResponse;
 import ru.halcyon.meetingease.security.JwtAuthentication;
 import ru.halcyon.meetingease.service.auth.JwtProvider;
 import ru.halcyon.meetingease.service.auth.client.ClientAuthService;
+import ru.halcyon.meetingease.service.client.ClientService;
 import ru.halcyon.meetingease.util.JwtUtil;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -33,7 +34,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 @SpringBootTest
 @Testcontainers
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
-public class ClientAuthServiceTests {
+class ClientAuthServiceTests {
     @Container
     static PostgreSQLContainer<?> postgres = TestPostgresContainer.getInstance();
 
@@ -45,6 +46,9 @@ public class ClientAuthServiceTests {
 
     @Autowired
     private JwtProvider jwtProvider;
+
+    @Autowired
+    private ClientService clientService;
 
     @Autowired
     private ClientAuthService clientAuthService;
@@ -79,7 +83,7 @@ public class ClientAuthServiceTests {
         AuthResponse response = clientAuthService.register(dto);
         isValidAuthResponse(response);
 
-        Client client = clientRepository.findByEmail(dto.getEmail()).get();
+        Client client = clientService.findByEmail(dto.getEmail());
 
         assertThat(client).isNotNull();
         assertThat(client.getName()).isEqualTo(dto.getName());
@@ -150,7 +154,7 @@ public class ClientAuthServiceTests {
     void verifyByToken() {
         String accessToken = clientAuthService.register(getClientDto()).getAccessToken();
         String response = clientAuthService.verifyByToken(accessToken);
-        Client client = clientRepository.findByEmail(EMAIL).get();
+        Client client = clientService.findByEmail(EMAIL);
 
         assertThat(response).isEqualTo("Account is verified");
         assertThat(client.getIsVerified()).isTrue();

@@ -22,6 +22,7 @@ import ru.halcyon.meetingease.model.Client;
 import ru.halcyon.meetingease.model.Meeting;
 import ru.halcyon.meetingease.repository.*;
 import ru.halcyon.meetingease.security.JwtAuthentication;
+import ru.halcyon.meetingease.service.agent.AgentService;
 import ru.halcyon.meetingease.service.chat.ChatMessageService;
 import ru.halcyon.meetingease.support.Role;
 import ru.halcyon.meetingease.support.Status;
@@ -40,7 +41,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
         webEnvironment = SpringBootTest.WebEnvironment.MOCK
 )
 @AutoConfigureMockMvc
-public class ChatControllerTests {
+class ChatControllerTests {
     @Autowired
     private MockMvc mvc;
 
@@ -51,7 +52,7 @@ public class ChatControllerTests {
     private MeetingRepository meetingRepository;
 
     @Autowired
-    private AgentRepository agentRepository;
+    private AgentService agentService;
 
     @Autowired
     private DealRepository dealRepository;
@@ -62,6 +63,7 @@ public class ChatControllerTests {
     @Autowired
     private ChatMessageService chatMessageService;
 
+    private static final String AGENT_EMAIL = "ivan.ivanov@example.com";
     private static final String OWNER_EMAIL = "owner_email@gmail.com";
 
     @BeforeEach
@@ -76,7 +78,7 @@ public class ChatControllerTests {
         Client sender = createClient();
         setJwtAuth(true);
 
-        Agent recipient = agentRepository.findByEmail("ivan.ivanov@example.com").get();
+        Agent recipient = agentService.findByEmail(AGENT_EMAIL);
         createMeeting(sender, recipient);
 
         ChatMessageCreateDto dto = new ChatMessageCreateDto(recipient.getId(), "test_content");
@@ -86,7 +88,7 @@ public class ChatControllerTests {
 
     @Test
     void processMessageByAgentSender() throws Exception {
-        Agent sender = agentRepository.findByEmail("ivan.ivanov@example.com").get();
+        Agent sender = agentService.findByEmail(AGENT_EMAIL);
         setJwtAuth(false);
 
         Client recipient = createClient();
@@ -102,7 +104,7 @@ public class ChatControllerTests {
         Client sender = createClient();
         setJwtAuth(true);
 
-        Agent recipient = agentRepository.findByEmail("ivan.ivanov@example.com").get();
+        Agent recipient = agentService.findByEmail(AGENT_EMAIL);
         createMeeting(sender, recipient);
 
         ChatMessageCreateDto dto = new ChatMessageCreateDto(recipient.getId(), " ");
@@ -123,7 +125,7 @@ public class ChatControllerTests {
         Client sender = createClient();
         setJwtAuth(true);
 
-        Agent recipient = agentRepository.findByEmail("ivan.ivanov@example.com").get();
+        Agent recipient = agentService.findByEmail(AGENT_EMAIL);
         createMeeting(sender, recipient);
 
         ChatMessageCreateDto dto = new ChatMessageCreateDto(recipient.getId(), "test_content");
@@ -166,7 +168,7 @@ public class ChatControllerTests {
     }
 
     private void setJwtAuth(boolean isClient) {
-        JwtAuthentication jwtAuthentication = new JwtAuthentication(true, isClient ? OWNER_EMAIL : "ivan.ivanov@example.com", isClient);
+        JwtAuthentication jwtAuthentication = new JwtAuthentication(true, isClient ? OWNER_EMAIL : AGENT_EMAIL, isClient);
         SecurityContextHolder.getContext().setAuthentication(jwtAuthentication);
     }
 

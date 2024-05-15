@@ -14,6 +14,7 @@ import ru.halcyon.meetingease.exception.ResourceNotFoundException;
 import ru.halcyon.meetingease.model.Client;
 import ru.halcyon.meetingease.model.Company;
 import ru.halcyon.meetingease.repository.MeetingRepository;
+import ru.halcyon.meetingease.service.client.ClientService;
 import ru.halcyon.meetingease.support.Role;
 import ru.halcyon.meetingease.repository.ClientRepository;
 import ru.halcyon.meetingease.repository.CompanyRepository;
@@ -26,7 +27,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 @SpringBootTest
 @Testcontainers
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
-public class CompanyServiceTests {
+class CompanyServiceTests {
     @Container
     static PostgreSQLContainer<?> postgres = TestPostgresContainer.getInstance();
 
@@ -38,6 +39,9 @@ public class CompanyServiceTests {
 
     @Autowired
     private MeetingRepository meetingRepository;
+
+    @Autowired
+    private ClientService clientService;
 
     @Autowired
     private CompanyService companyService;
@@ -71,8 +75,9 @@ public class CompanyServiceTests {
         createdCompany = companyRepository.save(createdCompany);
 
         Company receivedCompany = companyService.findById(createdCompany.getId());
-        assertThat(receivedCompany).isNotNull();
-        assertThat(receivedCompany).isEqualTo(createdCompany);
+        assertThat(receivedCompany)
+                .isNotNull()
+                .isEqualTo(createdCompany);
     }
 
     @Test
@@ -103,7 +108,7 @@ public class CompanyServiceTests {
         Client client = createClient("test_email@gmail.com");
 
         company = companyService.addClient(company.getId(), client.getEmail());
-        client = clientRepository.findById(client.getId()).get();
+        client = clientService.findById(client.getId());
 
         assertThat(company.getClients()).contains(client);
         assertThat(client.getCompany()).isEqualTo(company);
@@ -119,9 +124,9 @@ public class CompanyServiceTests {
         company = companyService.addClient(company.getId(), client.getEmail());
 
         company = companyService.removeClient(company.getId(), client.getEmail());
-        client = clientRepository.findById(client.getId()).get();
+        client = clientService.findById(client.getId());
 
-        assertThat(company.getClients().contains(client)).isFalse();
+        assertThat(company.getClients()).doesNotContain(client);
         assertThat(client.getCompany()).isNull();
     }
 

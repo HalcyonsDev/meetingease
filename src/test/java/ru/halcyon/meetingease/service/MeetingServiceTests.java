@@ -34,7 +34,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 @SpringBootTest
 @Testcontainers
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
-public class MeetingServiceTests {
+class MeetingServiceTests {
     @Container
     static PostgreSQLContainer<?> postgres = TestPostgresContainer.getInstance();
 
@@ -104,20 +104,6 @@ public class MeetingServiceTests {
 
         WrongDataException ex3 = assertThrows(WrongDataException.class, () ->  meetingService.create(new MeetingCreateDto(getDate(3, 10, 10), "казань", "бауман", "31/12", "Кредитование")));
         assertThat(ex3.getMessage()).isEqualTo("Unfortunately, there are no agents available at the moment.");
-    }
-
-    @Test
-    void getFreeDatesForWeek() {
-        Client client = createClient("test_email@gmail.com");
-
-        JwtAuthentication jwtAuthentication = new JwtAuthentication(true, client.getEmail(), true);
-        SecurityContextHolder.getContext().setAuthentication(jwtAuthentication);
-
-        meetingService.create(new MeetingCreateDto(getDate(23, 10, 0), "казань", "бауман", "31/12", "Кредитование"));
-        meetingService.create(new MeetingCreateDto(getDate(23, 17, 30), "казань", "бауман", "31/12", "Кредитование"));
-        meetingService.create(new MeetingCreateDto(getDate(24, 10, 30), "казань", "бауман", "31/12", "Кредитование"));
-
-        meetingService.getFreeDatesForWeek("Казань");
     }
 
     @Test

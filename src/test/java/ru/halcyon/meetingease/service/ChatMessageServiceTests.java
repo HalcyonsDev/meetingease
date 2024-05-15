@@ -17,6 +17,7 @@ import ru.halcyon.meetingease.model.Client;
 import ru.halcyon.meetingease.model.Meeting;
 import ru.halcyon.meetingease.repository.*;
 import ru.halcyon.meetingease.security.JwtAuthentication;
+import ru.halcyon.meetingease.service.agent.AgentService;
 import ru.halcyon.meetingease.service.chat.ChatMessageService;
 import ru.halcyon.meetingease.support.Role;
 import ru.halcyon.meetingease.support.Status;
@@ -32,7 +33,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 @SpringBootTest
 @Testcontainers
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
-public class ChatMessageServiceTests {
+class ChatMessageServiceTests {
     @Container
     public static PostgreSQLContainer<?> postgres = TestPostgresContainer.getInstance();
 
@@ -46,13 +47,13 @@ public class ChatMessageServiceTests {
     private ChatMessageService chatMessageService;
 
     @Autowired
-    private AgentRepository agentRepository;
-
-    @Autowired
     private MeetingRepository meetingRepository;
 
     @Autowired
     private DealRepository dealRepository;
+
+    @Autowired
+    private AgentService agentService;
 
     @BeforeAll
     static void beforeAll() {
@@ -88,8 +89,9 @@ public class ChatMessageServiceTests {
 
         ChatMessage receivedChatMessage = chatMessageService.findById(createdChatMessage.getId());
 
-        assertThat(receivedChatMessage).isNotNull();
-        assertThat(receivedChatMessage).isEqualTo(createdChatMessage);
+        assertThat(receivedChatMessage)
+                .isNotNull()
+                .isEqualTo(createdChatMessage);
     }
 
     @Test
@@ -123,7 +125,7 @@ public class ChatMessageServiceTests {
     void processAgentMessage() {
         Client client = createClient();
         createMeeting(client);
-        Agent agent = agentRepository.findById(1L).get();
+        Agent agent = agentService.findById(1L);
 
         setJwtAuth(agent.getEmail(), false);
 
@@ -138,7 +140,7 @@ public class ChatMessageServiceTests {
     @Test
     void processAgentMessage_ChecksMeetingExisting() {
         Client client = createClient();
-        Agent agent = agentRepository.findById(1L).get();
+        Agent agent = agentService.findById(1L);
 
         setJwtAuth(agent.getEmail(), false);
 
@@ -179,7 +181,7 @@ public class ChatMessageServiceTests {
     void processAgentMessages() {
         Client client = createClient();
         createMeeting(client);
-        Agent agent = agentRepository.findById(1L).get();
+        Agent agent = agentService.findById(1L);
 
         setJwtAuth(agent.getEmail(), false);
 
@@ -195,7 +197,7 @@ public class ChatMessageServiceTests {
     @Test
     void processAgentMessages_ChecksMeetingExisting() {
         Client client = createClient();
-        Agent agent = agentRepository.findById(1L).get();
+        Agent agent = agentService.findById(1L);
 
         setJwtAuth(agent.getEmail(), false);
 
@@ -221,12 +223,12 @@ public class ChatMessageServiceTests {
         );
     }
 
-    private Meeting createMeeting(Client client) {
-        Agent agent = agentRepository.findById(1L).get();
+    private void createMeeting(Client client) {
+        Agent agent = agentService.findById(1L);
 
-        return meetingRepository.save(
+        meetingRepository.save(
                 Meeting.builder()
-                        .date(getDate(2, 14, 30))
+                        .date(getDate())
                         .status(Status.IN_WAITING)
                         .address("test_address")
                         .city("test_city")
@@ -244,7 +246,7 @@ public class ChatMessageServiceTests {
         SecurityContextHolder.getContext().setAuthentication(jwtAuthentication);
     }
 
-    private Instant getDate(int day, int hour, int minute) {
-        return LocalDateTime.of(2024, 4, day, hour, minute).atZone(ZoneId.systemDefault()).toInstant();
+    private Instant getDate() {
+        return LocalDateTime.of(2024, 4, 2, 14, 30).atZone(ZoneId.systemDefault()).toInstant();
     }
 }

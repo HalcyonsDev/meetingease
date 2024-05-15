@@ -34,7 +34,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
         webEnvironment = SpringBootTest.WebEnvironment.MOCK
 )
 @AutoConfigureMockMvc
-public class CompanyControllerTests {
+class CompanyControllerTests {
     @Autowired
     private MockMvc mvc;
 
