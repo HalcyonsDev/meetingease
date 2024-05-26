@@ -1,8 +1,8 @@
 -- =========================================
 -- Description: Create the agents table
 -- Author: Halcyon
--- Date: 2024-04-05
--- Version: V1.0.0
+-- Date: 2024-05-26
+-- Version: V1.0.1
 -- =========================================
 
 CREATE TABLE IF NOT EXISTS agents(
@@ -13,5 +13,5 @@ CREATE TABLE IF NOT EXISTS agents(
     phone_number VARCHAR(20) NOT NULL,
     city VARCHAR(100) NOT NULL,
     password VARCHAR(100) NOT NULL,
-    photo VARCHAR(100)
+    photo VARCHAR(100) NOT NULL
 )
