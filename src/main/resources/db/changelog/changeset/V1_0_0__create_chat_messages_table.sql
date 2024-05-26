@@ -1,7 +1,10 @@
--- changeset: create-chat-message
--- author: halcyon
+-- =========================================
+-- Description: Create the chat_messages table
+-- Author: Halcyon
+-- Date: 2024-04-05
+-- Version: V1.0.0
+-- =========================================
 
--- createTable: chat_messages
 CREATE TABLE IF NOT EXISTS chat_messages (
     id BIGSERIAL PRIMARY KEY NOT NULL,
     created_at TIMESTAMP NOT NULL,

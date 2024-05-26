@@ -1,17 +1,17 @@
 databaseChangeLog:
   - include:
-      file: db/changelog/changeset/create-company-table.sql
+      file: db/changelog/changeset/V1_0_0__create_companies_table.sql
   - include:
-      file: db/changelog/changeset/create-client-table.sql
+      file: db/changelog/changeset/V1_0_0__create_clients_table.sql
   - include:
-      file: db/changelog/changeset/create-agent-table.sql
+      file: db/changelog/changeset/V1_0_0__create_agents_table.sql
   - include:
-      file: db/changelog/changeset/create-deal-table.sql
+      file: db/changelog/changeset/V1_0_0__create_deals_table.sql
   - include:
-      file: db/changelog/changeset/create-meeting-table.sql
+      file: db/changelog/changeset/V1_0_0__create_meetings_table.sql
   - include:
-      file: db/changelog/changeset/create-meetings-clients-table.sql
+      file: db/changelog/changeset/V1_0_0__create_meetings_clients_table.sql
   - include:
-      file: db/changelog/changeset/create-chat-message-table.sql
+      file: db/changelog/changeset/V1_0_0__create_chat_messages_table.sql
   - include:
-      file: db/changelog/changeset/insert-data.sql
+      file: db/changelog/changeset/V1_0_0__insert_data.sql
