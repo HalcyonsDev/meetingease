@@ -36,3 +36,7 @@ jwt:
   secret:
     access: szdxcAew/l0CdtVhIpTDQSucIG8ZaIs8nl4LFuZ1QLHme13v9nTy+uCaV6/7oy0Kohi2JLaokndltIeOtThaww==
     refresh: gVxFuBqj6BkQVY1A8Hm3Jk0xcHQAwQ0gWJOLKwpXJLtojylfc3Y1l384GGnjKJx3RAF0ETKj7MVYvRok5sfjfg==
+
+file:
+  storage:
+    location: /var/www/talknet/uploads
