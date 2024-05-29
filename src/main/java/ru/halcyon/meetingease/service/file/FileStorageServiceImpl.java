@@ -1,15 +1,11 @@
 package ru.halcyon.meetingease.service.file;
 
 import jakarta.annotation.PostConstruct;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
 import ru.halcyon.meetingease.exception.StorageException;
-import ru.halcyon.meetingease.model.Client;
-import ru.halcyon.meetingease.service.auth.client.ClientAuthService;
-import ru.halcyon.meetingease.service.client.ClientService;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -23,20 +19,13 @@ import java.util.UUID;
 
 @Service
 public class FileStorageServiceImpl implements FileStorageService {
-    private final ClientService clientService;
-    private final ClientAuthService clientAuthService;
-
     private final Path rootLocation;
     private static final List<String> ALLOWED_CONTENT_TYPES = List.of("image/jpeg", "image/png");
 
     public FileStorageServiceImpl(
-            @Value("${file.storage.location}") String storageLocation,
-            @Autowired ClientService clientService,
-            @Autowired ClientAuthService clientAuthService
+            @Value("${file.storage.location}") String storageLocation
     ) {
         this.rootLocation = Paths.get(storageLocation);
-        this.clientService = clientService;
-        this.clientAuthService = clientAuthService;
     }
 
     @PostConstruct
@@ -63,7 +52,6 @@ public class FileStorageServiceImpl implements FileStorageService {
             }
 
             Path destinationFile = rootLocation.resolve(filename).normalize().toAbsolutePath();
-            saveClientPhoto(destinationFile.toString());
 
             if (!destinationFile.getParent().equals(rootLocation.toAbsolutePath())) {
                 throw new StorageException("Can't store file outside current directory.");
@@ -77,11 +65,5 @@ public class FileStorageServiceImpl implements FileStorageService {
         } catch (IOException ex) {
             throw new StorageException("Failed to store file.", ex);
         }
-    }
-
-    private void saveClientPhoto(String filepath) {
-        Client client = clientService.findByEmail(clientAuthService.getAuthInfo().getEmail());
-        client.setPhoto(filepath);
-        clientService.save(client);
     }
 }
