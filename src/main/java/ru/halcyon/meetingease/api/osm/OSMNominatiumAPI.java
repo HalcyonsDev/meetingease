@@ -6,7 +6,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.http.*;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
-import ru.halcyon.meetingease.exception.WrongDataException;
+import ru.halcyon.meetingease.exception.InvalidCredentialsException;
 import ru.halcyon.meetingease.support.Address;
 
 @Component
@@ -23,7 +23,7 @@ public class OSMNominatiumAPI {
         HttpStatusCode status = response.getStatusCode();
 
         if (!status.is2xxSuccessful()) {
-            throw new WrongDataException("Something went wrong.");
+            throw new InvalidCredentialsException("Something went wrong.");
         }
 
         String responseBody = response.getBody();
@@ -56,7 +56,7 @@ public class OSMNominatiumAPI {
         try {
             jsonNode.get(0).get("address").get("house_number");
         } catch (Exception ignored) {
-            throw new WrongDataException("Please specify the correct house for the meeting.");
+            throw new InvalidCredentialsException("Please specify the correct house for the meeting.");
         }
     }
 }

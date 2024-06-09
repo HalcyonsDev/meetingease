@@ -8,7 +8,24 @@ services:
       POSTGRES_PASSWORD: password
       POSTGRES_DB: meeting_ease
     ports:
-      - "5433:5432"
+      - "5432:5432"
+    depends_on:
+      - redis
+    networks:
+      - meetingease-network
+
+  redis:
+    image: redis:alpine
+    container_name: redis
+    hostname: redis
+    ports:
+      - '6379:6379'
+    environment:
+      REDIS_PORT: 6379
+      REDIS_PASSWORD: password
+    command: ["redis-server", "--requirepass", "password"]
+    volumes:
+      - redis:/data
     networks:
       - meetingease-network
 
@@ -21,9 +38,12 @@ services:
       - meetingease-network
     depends_on:
       - postgres
+      - redis
 
 volumes:
   postgres:
+  redis:
+    driver: local
 
 networks:
   meetingease-network:

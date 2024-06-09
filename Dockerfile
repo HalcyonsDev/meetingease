@@ -14,5 +14,6 @@ FROM openjdk:17-jdk
 WORKDIR /app
 
 COPY --from=build /workspace/app/build/libs/meetingease-0.0.1-SNAPSHOT.jar /app/meetingease.jar
+COPY .env /app/.env
 
 CMD ["java", "-jar", "/app/meetingease.jar"]

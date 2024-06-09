@@ -1,14 +1,25 @@
+server:
+  port: 8080
+
 spring:
   application:
     name: meetingease
+
+  config:
+    import: optional:file:.env[.properties]
 
   liquibase:
     enabled: true
   
   datasource:
-    url: jdbc:postgresql://postgres:5433/meeting_ease
-    username: postgres
-    password: password
+    url: ${POSTGRES_URL}
+    username: ${POSTGRES_USERNAME}
+    password: ${POSTGRES_PASSWORD}
+
+  data:
+    redis:
+      host: ${REDIS_HOSTNAME}
+      port: 6379
 
   jpa:
     hibernate:
@@ -18,8 +29,8 @@ spring:
     protocol: smtp
     host: smtp.gmail.com
     port: 587
-    username: meetingease@gmail.com
-    password: password
+    username: ${MAIL_USERNAME}
+    password: ${MAIL_PASSWORD}
     default-encoding: UTF-8
     properties:
       mail:
@@ -33,10 +44,14 @@ spring:
             required: true
 
 jwt:
-  secret:
-    access: szdxcAew/l0CdtVhIpTDQSucIG8ZaIs8nl4LFuZ1QLHme13v9nTy+uCaV6/7oy0Kohi2JLaokndltIeOtThaww==
-    refresh: gVxFuBqj6BkQVY1A8Hm3Jk0xcHQAwQ0gWJOLKwpXJLtojylfc3Y1l384GGnjKJx3RAF0ETKj7MVYvRok5sfjfg==
+  token:
+    access-token:
+      private-key: ${PRIVATE_KEY}
+      public-key: ${PUBLIC_KEY}
+      validity: 30
+    refresh-token:
+      validity:  120
 
 file:
   storage:
-    location: /var/www/talknet/uploads
+    location: ${STORAGE_LOCATION}

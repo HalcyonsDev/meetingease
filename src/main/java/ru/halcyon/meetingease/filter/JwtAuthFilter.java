@@ -9,8 +9,10 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
+import ru.halcyon.meetingease.exception.TokenVerificationException;
 import ru.halcyon.meetingease.security.JwtAuthentication;
-import ru.halcyon.meetingease.service.auth.JwtProvider;
+import ru.halcyon.meetingease.security.JwtProvider;
+import ru.halcyon.meetingease.service.auth.TokenRevocationService;
 import ru.halcyon.meetingease.util.JwtUtil;
 
 import java.io.IOException;
@@ -19,13 +21,19 @@ import java.io.IOException;
 @RequiredArgsConstructor
 public class JwtAuthFilter extends OncePerRequestFilter {
     private final JwtProvider jwtProvider;
+    private final TokenRevocationService tokenRevocationService;
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
         String jwtToken = getTokenFromRequest(request);
 
         if (jwtToken != null && jwtProvider.isValidAccessToken(jwtToken)) {
-            Claims claims = jwtProvider.extractAccessClaims(jwtToken);
+
+            if (tokenRevocationService.isRevoked(jwtToken)) {
+                throw new TokenVerificationException();
+            }
+
+            Claims claims = jwtProvider.extractAllClaims(jwtToken);
 
             JwtAuthentication jwtAuth = JwtUtil.getAuthentication(claims);
             jwtAuth.setAuthenticated(true);
