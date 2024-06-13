@@ -1,10 +1,8 @@
 package ru.halcyon.meetingease.service.auth;
 
 import lombok.RequiredArgsConstructor;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-import ru.halcyon.meetingease.config.TokenConfigProperties;
 import ru.halcyon.meetingease.dto.ClientRegisterDto;
 import ru.halcyon.meetingease.exception.ResourceAlreadyExistsException;
 import ru.halcyon.meetingease.exception.TokenVerificationException;
@@ -16,14 +14,11 @@ import ru.halcyon.meetingease.service.mail.MailService;
 import ru.halcyon.meetingease.support.Role;
 import ru.halcyon.meetingease.util.CacheManager;
 
-import java.time.Duration;
-
 @Service
 @RequiredArgsConstructor
 public class ClientAuthService {
     private final JwtProvider jwtProvider;
     private final RefreshTokenGenerator refreshTokenGenerator;
-    private final TokenConfigProperties tokenConfigProperties;
     private final CacheManager cacheManager;
     private final PasswordEncoder passwordEncoder;
     private final ClientService clientService;
@@ -49,8 +44,6 @@ public class ClientAuthService {
         AuthResponse response = getAuthResponse(client);
         mailService.sendSimpleVerificationMailMessage(client.getName(), client.getEmail(), response.getAccessToken());
 
-        saveRefreshTokenInCache(response.getRefreshToken(), client.getEmail());
-
         return response;
     }
 
@@ -62,15 +55,12 @@ public class ClientAuthService {
             throw new InvalidCredentialsException("Invalid login credentials provided.");
         }
 
-        AuthResponse response = getAuthResponse(client);
-        saveRefreshTokenInCache(response.getRefreshToken(), client.getEmail());
-
-        return response;
+        return getAuthResponse(client);
     }
 
     private AuthResponse getAuthResponse(Client client) {
         String accessToken = jwtProvider.generateAccessTokenForClient(client);
-        String refreshToken = refreshTokenGenerator.generate();
+        String refreshToken = refreshTokenGenerator.generate(client.getEmail());
 
         return new AuthResponse(accessToken, refreshToken);
     }
@@ -82,12 +72,7 @@ public class ClientAuthService {
         Client client = clientService.findByEmail(subject);
 
         String accessToken = jwtProvider.generateAccessTokenForClient(client);
-
-        String newRefreshToken = null;
-        if (isRefresh) {
-            newRefreshToken = refreshTokenGenerator.generate();
-            saveRefreshTokenInCache(newRefreshToken, client.getEmail());
-        }
+        String newRefreshToken = isRefresh ? refreshTokenGenerator.generate(client.getEmail()) : null;
 
         return new AuthResponse(accessToken, newRefreshToken);
     }
@@ -101,10 +86,5 @@ public class ClientAuthService {
         clientService.save(client);
 
         return "Account is verified";
-    }
-
-    private void saveRefreshTokenInCache(String refreshToken, String email) {
-        int refreshTokenValidity = tokenConfigProperties.getRefreshToken().getValidity();
-        cacheManager.save(refreshToken, email, Duration.ofMinutes(refreshTokenValidity));
     }
 }

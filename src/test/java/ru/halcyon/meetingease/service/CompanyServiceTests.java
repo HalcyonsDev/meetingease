@@ -5,21 +5,22 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.test.context.DynamicPropertyRegistry;
+import org.springframework.test.context.DynamicPropertySource;
 import org.testcontainers.containers.PostgreSQLContainer;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
-import ru.halcyon.meetingease.TestPostgresContainer;
 import ru.halcyon.meetingease.dto.CompanyCreateDto;
 import ru.halcyon.meetingease.exception.ResourceNotFoundException;
 import ru.halcyon.meetingease.model.Client;
 import ru.halcyon.meetingease.model.Company;
 import ru.halcyon.meetingease.repository.MeetingRepository;
 import ru.halcyon.meetingease.service.client.ClientService;
+import ru.halcyon.meetingease.service.company.CompanyService;
 import ru.halcyon.meetingease.support.Role;
 import ru.halcyon.meetingease.repository.ClientRepository;
 import ru.halcyon.meetingease.repository.CompanyRepository;
 import ru.halcyon.meetingease.security.JwtAuthentication;
-import ru.halcyon.meetingease.service.company.CompanyService;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -28,9 +29,6 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 @Testcontainers
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
 class CompanyServiceTests {
-    @Container
-    static PostgreSQLContainer<?> postgres = TestPostgresContainer.getInstance();
-
     @Autowired
     private CompanyRepository companyRepository;
 
@@ -45,6 +43,16 @@ class CompanyServiceTests {
 
     @Autowired
     private CompanyService companyService;
+
+    @Container
+    private static final PostgreSQLContainer<?> postgres = new PostgreSQLContainer<>("postgres:15.6");
+
+    @DynamicPropertySource
+    public static void configureProperties(DynamicPropertyRegistry registry) {
+        registry.add("spring.datasource.url", postgres::getJdbcUrl);
+        registry.add("spring.datasource.username", postgres::getUsername);
+        registry.add("spring.datasource.password", postgres::getPassword);
+    }
 
     @BeforeAll
     static void beforeAll() {

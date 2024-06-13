@@ -18,7 +18,7 @@ import ru.halcyon.meetingease.dto.ClientRegisterDto;
 import ru.halcyon.meetingease.repository.ClientRepository;
 import ru.halcyon.meetingease.security.AuthRequest;
 import ru.halcyon.meetingease.security.RefreshRequest;
-import ru.halcyon.meetingease.service.auth.client.ClientAuthService;
+import ru.halcyon.meetingease.service.auth.ClientAuthService;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;

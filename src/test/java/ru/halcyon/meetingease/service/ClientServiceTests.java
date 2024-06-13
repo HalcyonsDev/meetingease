@@ -6,10 +6,11 @@ import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabas
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.test.context.DynamicPropertyRegistry;
+import org.springframework.test.context.DynamicPropertySource;
 import org.testcontainers.containers.PostgreSQLContainer;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
-import ru.halcyon.meetingease.TestPostgresContainer;
 import ru.halcyon.meetingease.dto.ClientUpdateDto;
 import ru.halcyon.meetingease.dto.CompanyCreateDto;
 import ru.halcyon.meetingease.exception.ResourceForbiddenException;
@@ -24,7 +25,6 @@ import ru.halcyon.meetingease.service.client.ClientService;
 import ru.halcyon.meetingease.service.company.CompanyService;
 import ru.halcyon.meetingease.support.Role;
 
-import java.io.File;
 import java.nio.file.Files;
 import java.nio.file.Path;
 
@@ -36,9 +36,6 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 @Testcontainers
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
 class ClientServiceTests {
-    @Container
-    static PostgreSQLContainer<?> postgres = TestPostgresContainer.getInstance();
-
     private static final String ADMIN_EMAIL = "test_email@gmail.com";
 
     @Autowired
@@ -55,6 +52,16 @@ class ClientServiceTests {
 
     @Autowired
     private AgentService agentService;
+
+    @Container
+    private static final PostgreSQLContainer<?> postgres = new PostgreSQLContainer<>("postgres:15.6");
+
+    @DynamicPropertySource
+    public static void configureProperties(DynamicPropertyRegistry registry) {
+        registry.add("spring.datasource.url", postgres::getJdbcUrl);
+        registry.add("spring.datasource.username", postgres::getUsername);
+        registry.add("spring.datasource.password", postgres::getPassword);
+    }
 
     @BeforeAll
     static void beforeAll() {

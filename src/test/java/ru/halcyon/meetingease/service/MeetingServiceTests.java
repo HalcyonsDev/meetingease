@@ -5,24 +5,25 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.test.context.DynamicPropertyRegistry;
+import org.springframework.test.context.DynamicPropertySource;
 import org.testcontainers.containers.PostgreSQLContainer;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
-import ru.halcyon.meetingease.TestPostgresContainer;
 import ru.halcyon.meetingease.dto.CompanyCreateDto;
 import ru.halcyon.meetingease.dto.MeetingCreateDto;
-import ru.halcyon.meetingease.exception.WrongDataException;
+import ru.halcyon.meetingease.exception.InvalidCredentialsException;
 import ru.halcyon.meetingease.model.Client;
 import ru.halcyon.meetingease.model.Deal;
 import ru.halcyon.meetingease.model.Meeting;
+import ru.halcyon.meetingease.service.company.CompanyService;
+import ru.halcyon.meetingease.service.meeting.MeetingService;
 import ru.halcyon.meetingease.support.Role;
 import ru.halcyon.meetingease.repository.ClientRepository;
 import ru.halcyon.meetingease.repository.CompanyRepository;
 import ru.halcyon.meetingease.repository.DealRepository;
 import ru.halcyon.meetingease.repository.MeetingRepository;
 import ru.halcyon.meetingease.security.JwtAuthentication;
-import ru.halcyon.meetingease.service.company.CompanyService;
-import ru.halcyon.meetingease.service.meeting.MeetingService;
 
 import java.time.Instant;
 import java.time.LocalDateTime;
@@ -35,9 +36,6 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 @Testcontainers
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
 class MeetingServiceTests {
-    @Container
-    static PostgreSQLContainer<?> postgres = TestPostgresContainer.getInstance();
-
     @Autowired
     private MeetingRepository meetingRepository;
 
@@ -55,6 +53,16 @@ class MeetingServiceTests {
 
     @Autowired
     private CompanyService companyService;
+
+    @Container
+    private static final PostgreSQLContainer<?> postgres = new PostgreSQLContainer<>("postgres:15.6");
+
+    @DynamicPropertySource
+    public static void configureProperties(DynamicPropertyRegistry registry) {
+        registry.add("spring.datasource.url", postgres::getJdbcUrl);
+        registry.add("spring.datasource.username", postgres::getUsername);
+        registry.add("spring.datasource.password", postgres::getPassword);
+    }
 
     @BeforeAll
     static void beforeAll() {
@@ -93,8 +101,8 @@ class MeetingServiceTests {
                 new MeetingCreateDto(getDate(2, 10, 0), "казань", "бауман", "31/12", "Кредитование")
         );
 
-        WrongDataException ex1 = assertThrows(WrongDataException.class, () -> meetingService.create(new MeetingCreateDto(getDate(2, 10, 10), "казань", "бауман", "31/12", "Кредитование")));
-        WrongDataException ex2 = assertThrows(WrongDataException.class, () -> meetingService.create(new MeetingCreateDto(getDate(2, 10, 30), "казань", "бауман", "31/12", "Кредитование")));
+        InvalidCredentialsException ex1 = assertThrows(InvalidCredentialsException.class, () -> meetingService.create(new MeetingCreateDto(getDate(2, 10, 10), "казань", "бауман", "31/12", "Кредитование")));
+        InvalidCredentialsException ex2 = assertThrows(InvalidCredentialsException.class, () -> meetingService.create(new MeetingCreateDto(getDate(2, 10, 30), "казань", "бауман", "31/12", "Кредитование")));
 
         assertThat(ex1.getMessage()).isEqualTo("Unfortunately, there are no agents available at the moment.");
         assertThat(ex2.getMessage()).isEqualTo("Unfortunately, there are no agents available at the moment.");
@@ -102,7 +110,7 @@ class MeetingServiceTests {
         meetingService.create(new MeetingCreateDto(getDate(3, 10, 10), "казань", "бауман", "31/12", "Кредитование"));
         meetingService.create(new MeetingCreateDto(getDate(3, 10, 10), "казань", "бауман", "31/12", "Кредитование"));
 
-        WrongDataException ex3 = assertThrows(WrongDataException.class, () ->  meetingService.create(new MeetingCreateDto(getDate(3, 10, 10), "казань", "бауман", "31/12", "Кредитование")));
+        InvalidCredentialsException ex3 = assertThrows(InvalidCredentialsException.class, () ->  meetingService.create(new MeetingCreateDto(getDate(3, 10, 10), "казань", "бауман", "31/12", "Кредитование")));
         assertThat(ex3.getMessage()).isEqualTo("Unfortunately, there are no agents available at the moment.");
     }
 

@@ -15,7 +15,7 @@ public class AuthenticatedDataProvider {
 
     public boolean getIsClient() {
         return Optional.ofNullable((JwtAuthentication) SecurityContextHolder.getContext().getAuthentication())
-                .map(JwtAuthentication::isAuthenticated)
+                .map(JwtAuthentication::isClient)
                 .orElseThrow(IllegalStateException::new);
     }
 }

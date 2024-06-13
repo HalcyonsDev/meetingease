@@ -14,7 +14,7 @@ import org.testcontainers.shaded.com.fasterxml.jackson.databind.ObjectWriter;
 import org.testcontainers.shaded.com.fasterxml.jackson.databind.SerializationFeature;
 import ru.halcyon.meetingease.security.AuthRequest;
 import ru.halcyon.meetingease.security.RefreshRequest;
-import ru.halcyon.meetingease.service.auth.agent.AgentAuthService;
+import ru.halcyon.meetingease.service.auth.AgentAuthService;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;

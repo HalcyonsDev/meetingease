@@ -1,6 +1,6 @@
 package ru.halcyon.meetingease.service;
 
-import io.jsonwebtoken.Claims;
+import com.redis.testcontainers.RedisContainer;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
@@ -8,31 +8,49 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.test.context.DynamicPropertyRegistry;
+import org.springframework.test.context.DynamicPropertySource;
 import org.testcontainers.containers.PostgreSQLContainer;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
-import ru.halcyon.meetingease.TestPostgresContainer;
-import ru.halcyon.meetingease.exception.TokenValidationException;
-import ru.halcyon.meetingease.exception.WrongDataException;
+import org.testcontainers.utility.DockerImageName;
+import ru.halcyon.meetingease.exception.InvalidCredentialsException;
+import ru.halcyon.meetingease.exception.TokenVerificationException;
 import ru.halcyon.meetingease.security.AuthRequest;
 import ru.halcyon.meetingease.security.AuthResponse;
 import ru.halcyon.meetingease.security.JwtAuthentication;
-import ru.halcyon.meetingease.service.auth.JwtProvider;
-import ru.halcyon.meetingease.service.auth.agent.AgentAuthService;
-import ru.halcyon.meetingease.util.JwtUtil;
+import ru.halcyon.meetingease.security.JwtProvider;
+import ru.halcyon.meetingease.service.auth.AgentAuthService;
+import ru.halcyon.meetingease.util.CacheManager;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.*;
 
 @SpringBootTest
 @Testcontainers
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
 class AgentAuthServiceTests {
     @Container
-    static PostgreSQLContainer<?> postgres = TestPostgresContainer.getInstance();
+    private static final PostgreSQLContainer<?> postgres = new PostgreSQLContainer<>("postgres:15.6");
+
+    @Container
+    private static final RedisContainer redis = new RedisContainer(DockerImageName.parse("redis:5.0.5-alpine"))
+            .withExposedPorts(6379);
+
+    @DynamicPropertySource
+    public static void configureProperties(DynamicPropertyRegistry registry) {
+        registry.add("spring.datasource.url", postgres::getJdbcUrl);
+        registry.add("spring.datasource.username", postgres::getUsername);
+        registry.add("spring.datasource.password", postgres::getPassword);
+        registry.add("spring.data.redis.host", redis::getHost);
+        registry.add("spring.data.redis.port", () -> redis.getMappedPort(6379));
+    }
 
     @Autowired
     private JwtProvider jwtProvider;
+
+    @Autowired
+    private CacheManager cacheManager;
 
     @Autowired
     private AgentAuthService agentAuthService;
@@ -53,6 +71,8 @@ class AgentAuthServiceTests {
     void connectionEstablished() {
         assertThat(postgres.isCreated()).isTrue();
         assertThat(postgres.isRunning()).isTrue();
+        assertThat(redis.isCreated()).isTrue();
+        assertThat(redis.isRunning()).isTrue();
     }
 
     @Test
@@ -63,9 +83,9 @@ class AgentAuthServiceTests {
 
     @Test
     void loginChecksPassword() {
-        WrongDataException wrongDataException = assertThrows(WrongDataException.class,
+        InvalidCredentialsException wrongDataException = assertThrows(InvalidCredentialsException.class,
                 () -> agentAuthService.login(new AuthRequest(EMAIL, "wrong_password")));
-        assertThat(wrongDataException.getMessage()).isEqualTo("Wrong data.");
+        assertThat(wrongDataException.getMessage()).isEqualTo("Invalid login credentials provided.");
     }
 
     @Test
@@ -73,9 +93,7 @@ class AgentAuthServiceTests {
         String refreshToken = agentAuthService.login(getAuthRequest()).getRefreshToken();
         AuthResponse response = agentAuthService.getTokensByRefresh(refreshToken, false);
 
-        assertThat(response).isNotNull();
-        assertThat(response.getRefreshToken()).isNull();
-        isValidAccessToken(response.getAccessToken());
+        isValidAuthResponse(response);
     }
 
     @Test
@@ -84,21 +102,14 @@ class AgentAuthServiceTests {
         AuthResponse response = agentAuthService.getTokensByRefresh(refreshToken, true);
 
         isValidAuthResponse(response);
+        isValidRefreshToken(response.getRefreshToken(), EMAIL);
     }
 
     @Test
     void getTokensByRefreshChecksToken() {
-        TokenValidationException tokenValidationException = assertThrows(TokenValidationException.class,
+        TokenVerificationException tokenValidationException = assertThrows(TokenVerificationException.class,
                 () -> agentAuthService.getTokensByRefresh("invalid_token", false));
-        assertThat(tokenValidationException.getMessage()).isEqualTo("Refresh token is not valid.");
-    }
-
-    @Test
-    void getAuthInfo() {
-        JwtAuthentication jwtAuthentication = new JwtAuthentication(true, EMAIL, false);
-        SecurityContextHolder.getContext().setAuthentication(jwtAuthentication);
-
-        isValidJwtAuth(agentAuthService.getAuthInfo());
+        assertThat(tokenValidationException.getMessage()).isEqualTo("Authentication failure: Token missing, invalid, revoked or expired.");
     }
 
     private AuthRequest getAuthRequest() {
@@ -108,31 +119,15 @@ class AgentAuthServiceTests {
     private void isValidAuthResponse(AuthResponse response) {
         assertThat(response).isNotNull();
         isValidAccessToken(response.getAccessToken());
-        isValidRefreshToken(response.getRefreshToken());
     }
 
     private void isValidAccessToken(String accessToken) {
-        assertThat(accessToken).isNotNull();
-        assertThat(jwtProvider.isValidAccessToken(accessToken)).isTrue();
-
-        Claims claims = jwtProvider.extractAccessClaims(accessToken);
-        JwtAuthentication jwtAuthInfo = JwtUtil.getAuthentication(claims);
-
-        isValidJwtAuth(jwtAuthInfo);
+        assertNotNull(accessToken);
+        assertTrue(jwtProvider.isValidAccessToken(accessToken));
     }
 
-    private void isValidRefreshToken(String refreshToken) {
-        assertThat(refreshToken).isNotNull();
-        assertThat(jwtProvider.isValidRefreshToken(refreshToken)).isTrue();
-
-        Claims claims = jwtProvider.extractRefreshClaims(refreshToken);
-        JwtAuthentication jwtAuthInfo = JwtUtil.getAuthentication(claims);
-
-        isValidJwtAuth(jwtAuthInfo);
-    }
-
-    private void isValidJwtAuth(JwtAuthentication jwtAuthInfo) {
-        assertThat(jwtAuthInfo.getEmail()).isEqualTo(EMAIL);
-        assertThat(jwtAuthInfo.isClient()).isFalse();
+    private void isValidRefreshToken(String refreshToken, String email) {
+        assertTrue(cacheManager.isPresent(refreshToken));
+        assertThat(cacheManager.fetch(refreshToken, String.class)).contains(email);
     }
 }

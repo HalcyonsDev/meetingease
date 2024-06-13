@@ -5,10 +5,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.test.context.DynamicPropertyRegistry;
+import org.springframework.test.context.DynamicPropertySource;
 import org.testcontainers.containers.PostgreSQLContainer;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
-import ru.halcyon.meetingease.TestPostgresContainer;
 import ru.halcyon.meetingease.dto.ChatMessageCreateDto;
 import ru.halcyon.meetingease.exception.ResourceForbiddenException;
 import ru.halcyon.meetingease.model.Agent;
@@ -34,9 +35,6 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 @Testcontainers
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
 class ChatMessageServiceTests {
-    @Container
-    public static PostgreSQLContainer<?> postgres = TestPostgresContainer.getInstance();
-
     @Autowired
     private ClientRepository clientRepository;
 
@@ -54,6 +52,16 @@ class ChatMessageServiceTests {
 
     @Autowired
     private AgentService agentService;
+
+    @Container
+    private static final PostgreSQLContainer<?> postgres = new PostgreSQLContainer<>("postgres:15.6");
+
+    @DynamicPropertySource
+    public static void configureProperties(DynamicPropertyRegistry registry) {
+        registry.add("spring.datasource.url", postgres::getJdbcUrl);
+        registry.add("spring.datasource.username", postgres::getUsername);
+        registry.add("spring.datasource.password", postgres::getPassword);
+    }
 
     @BeforeAll
     static void beforeAll() {
